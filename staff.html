@@ -72,6 +72,9 @@ h2 .n { font: 600 .8rem var(--sans); background: var(--accent); color: var(--acc
 .order li { display: flex; justify-content: space-between; gap: 10px; }
 .order li small { display: block; color: var(--ink-soft); }
 .order .note { background: #fff1d6; border-radius: 10px; padding: 8px 10px; font-size: .88rem; margin-bottom: 10px; }
+.order .who { display: grid; gap: 3px; background: var(--plate); border-radius: 12px; padding: 10px 12px; margin-top: 8px; font-size: .9rem; }
+.order .who .dir { color: var(--ink-soft); font-style: italic; }
+.order .who a { color: var(--ink); font-weight: 600; }
 .order footer { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
 .order footer strong { font-variant-numeric: tabular-nums; }
 .order.done { opacity: .55; }
@@ -122,7 +125,7 @@ h2 .n { font: 600 .8rem var(--sans); background: var(--accent); color: var(--acc
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="layer"></div>
 
-<script src="live.js?v=3"></script>
+<script src="live.js?v=4"></script>
 <script>
 const L = PoffiesLive;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -172,10 +175,11 @@ function render(st) {
   const done = st.orders.filter(o => st.served[o.id]).sort((a, b) => b.ts - a.ts).slice(0, 10);
   open.forEach(o => keys.add('ord-' + o.id));
   const orderHTML = (o, isDone) => `<article class="order ${isDone ? 'done' : ''}" data-k="ord-${esc(o.id)}">
-    <header><b>${o.table ? 'Table ' + o.table : 'Pickup · ' + esc(o.name)}</b><span>Order ${esc(o.ref)} · ${ago(o.ts)}</span></header>
+    <header><b>${o.table ? 'Table ' + o.table : (o.mode === 'delivery' ? 'Delivery · ' : 'Pickup · ') + esc(o.name)}</b><span>Order ${esc(o.ref)} · ${ago(o.ts)}</span></header>
+    ${!o.table ? `<div class="who">${o.phone ? `<span>Call <b>${esc(o.phone)}</b></span>` : ''}${o.mode === 'delivery' && o.address ? `<span>${esc([o.address.building, o.address.flat && 'Flat ' + o.address.flat, o.address.street, o.address.area].filter(Boolean).join(', '))}</span>${o.address.notes ? `<span class="dir">${esc(o.address.notes)}</span>` : ''}<a target="_blank" rel="noopener" href="${o.address.loc ? `https://www.google.com/maps?q=${o.address.loc.lat},${o.address.loc.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([o.address.building, o.address.street, o.address.area, 'Dubai'].filter(Boolean).join(', '))}`}">Open in Maps${o.address.loc ? ' (exact pin)' : ''}</a>` : ''}</div>` : ''}
     <ul>${(o.lines || []).map(l => `<li><span>${l.qty} × ${esc(l.n)}${l.opts ? `<small>${esc(l.opts)}</small>` : ''}</span><span>${l.qty * l.unit} AED</span></li>`).join('')}</ul>
     ${o.note ? `<div class="note">${esc(o.note)}</div>` : ''}
-    <footer><strong>${o.total} AED · pay at counter</strong>${isDone ? '<span>Done</span>' : `<button class="act" type="button" data-served="${esc(o.id)}">${o.table ? 'Served' : 'Collected'}</button>`}</footer></article>`;
+    <footer><strong>${o.total} AED${o.mode === 'delivery' ? '' : ' · pay at counter'}</strong>${isDone ? '<span>Done</span>' : `<button class="act" type="button" data-served="${esc(o.id)}">${o.table ? 'Served' : o.mode === 'delivery' ? 'Out for delivery' : 'Collected'}</button>`}</footer></article>`;
   document.getElementById('orders').innerHTML = (open.length ? open.map(o => orderHTML(o, false)).join('') : '<div class="empty">No open orders.</div>')
     + (done.length ? `<button class="done-toggle" type="button" id="doneToggle">${showDone ? 'Hide' : 'Show'} finished orders (${done.length})</button>${showDone ? done.map(o => orderHTML(o, true)).join('') : ''}` : '');
   document.getElementById('orderCount').textContent = open.length;

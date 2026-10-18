@@ -226,6 +226,25 @@ legend { font: 600 .68rem var(--sans); letter-spacing: .2em; text-transform: upp
 .gconfirm .row { display: flex; gap: 10px; }
 .gconfirm .row button { flex: 1; }
 .pickup-note { background: var(--plate); border-radius: 12px; padding: 10px 12px; font-size: .85rem; margin: 0 0 4px; }
+.checkout { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 860px) { .checkout { grid-template-columns: 1fr; } }
+.co-back { border: 0; background: none; color: var(--ink-soft); font: 600 .8rem var(--sans); letter-spacing: .1em; text-transform: uppercase; padding: 4px 0 12px; cursor: pointer; }
+.co-card { background: var(--surface); border: 1.5px solid var(--line); border-radius: 20px; padding: 20px; }
+.co-card h2 { font: 400 clamp(1.5rem, 3vw, 2rem)/1.1 var(--serif); text-transform: uppercase; margin: 0 0 4px; }
+.co-card .hint { color: var(--ink-soft); margin: 0 0 14px; font-size: .9rem; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+.seg label { display: flex; flex-direction: column; gap: 2px; border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; cursor: pointer; }
+.seg label:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg b { font: 400 1.1rem var(--serif); text-transform: uppercase; }
+.seg span { font-size: .82rem; color: var(--ink-soft); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } }
+.field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--accent); }
+.field .err { color: #b2442f; font-size: .8rem; }
+.locbtn { margin-top: 10px; border: 1.5px dashed var(--line); background: transparent; border-radius: 12px; padding: 11px 12px; width: 100%; text-align: left; font: 500 .9rem var(--sans); cursor: pointer; }
+.locbtn.ok { border-style: solid; border-color: var(--ok); color: var(--ok); }
+.co-sum .line .step { display: none; }
 .games-btn { border: 0; background: rgba(255,255,255,.88); color: #4c2350; border-radius: 999px; padding: 8px 14px; font: 600 .78rem var(--sans); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
 .again { margin-top: 26px; border: 1.5px solid var(--line); background: transparent; border-radius: 14px; padding: 13px 20px; cursor: pointer; font-weight: 500; }
 
@@ -264,7 +283,7 @@ legend { font: 600 .68rem var(--sans); letter-spacing: .2em; text-transform: upp
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="layer"></div>
 
-<script src="live.js?v=3"></script>
+<script src="live.js?v=4"></script>
 <script>
 
 /* ---------- Menu data, copied from the Poffies Canva menu (Oct 2026) ---------- */
@@ -428,34 +447,38 @@ function orderHTML() {
       <span class="step"><button type="button" data-dec="${i}" aria-label="One less">−</button><output>${l.qty}</output><button type="button" data-inc="${i}" aria-label="One more">+</button></span>
     </div>`).join('')}
     <div class="totals"><span>Total</span><span>${aed(total())}</span></div>
-    ${AT_TABLE ? `<p class="note">Prices as on the menu. You pay at the counter.</p>`
-      : `<p class="pickup-note">Order now and collect it at the counter at Orchid Residence. You pay when you collect. Sitting in the café? Scan the QR code on your table instead.</p>
-      <label class="field"><span>Name for your order</span><input id="nameIn" type="text" maxlength="30" autocomplete="given-name" placeholder="So we can call you"></label>`}
+    ${AT_TABLE ? `<p class="note">Prices as on the menu. You pay at the counter.</p>
     <label class="field"><span>Note for the kitchen · optional</span><textarea id="noteIn" rows="2" maxlength="140" placeholder="Less sugar, no ice, nut allergy…"></textarea></label>
-    <button class="place" type="button" id="placeBtn"><span>Place order</span><span>${aed(total())}</span></button>
+    <button class="place" type="button" id="placeBtn"><span>Place order</span><span>${aed(total())}</span></button>`
+    : `<p class="note">Delivery to nearby areas, or pick it up yourself at Orchid Residence.</p>
+    <button class="place" type="button" id="checkoutBtn"><span>Checkout</span><span>${aed(total())}</span></button>`}
   </div>`;
 }
 function bindOrder(root) {
   root.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => { const l = cart[+b.dataset.inc]; l.qty++; changed(l.id); });
   root.querySelectorAll('[data-dec]').forEach(b => b.onclick = () => { const i = +b.dataset.dec, l = cart[i]; l.qty--; if (l.qty <= 0) cart.splice(i, 1); changed(l.id); });
+  const co = root.querySelector('#checkoutBtn'); if (co) co.onclick = () => { closeLayer(); showCheckout(); };
   const btn = root.querySelector('#placeBtn'); if (!btn) return;
-  const nameIn = root.querySelector('#nameIn');
-  const gate = () => { btn.disabled = !AT_TABLE && !nameIn.value.trim(); };
-  if (nameIn) nameIn.oninput = gate;
-  gate();
-  btn.onclick = () => place(root.querySelector('#noteIn').value.trim(), nameIn ? nameIn.value.trim() : '', btn);
+  btn.onclick = () => place({ mode: 'table', note: root.querySelector('#noteIn').value.trim() }, btn);
 }
 function paintOrder() {
   const panel = document.getElementById('panel');
   const keepNote = document.getElementById('noteIn') ? document.getElementById('noteIn').value : '';
-  const keepName = document.getElementById('nameIn') ? document.getElementById('nameIn').value : '';
   panel.innerHTML = orderHTML(); bindOrder(panel);
   const drawer = document.querySelector('.drawer');
   if (drawer) { if (!cart.length) closeLayer(); else { drawer.innerHTML = `<button class="x-close" type="button" data-close aria-label="Close">×</button>` + orderHTML(); bindOrder(drawer); } }
   const n = document.getElementById('noteIn'); if (n && keepNote) n.value = keepNote;
-  const nm = document.getElementById('nameIn'); if (nm && keepName) { nm.value = keepName; nm.dispatchEvent(new Event('input')); }
-  document.getElementById('bar').hidden = !cart.length || isDesk();
-  document.body.classList.toggle('has-bar', cart.length > 0);
+  document.getElementById('bar').hidden = !cart.length || isDesk() || inCheckout;
+  document.body.classList.toggle('has-bar', cart.length > 0 && !inCheckout);
+  if (inCheckout) {
+    if (!cart.length) { inCheckout = false; backToMenu(); }
+    else {
+      const cl = document.getElementById('coLines'), cp = document.getElementById('coPlace');
+      if (cl) cl.innerHTML = cart.map(l => `<div class="line"><span class="n">${l.qty} × ${esc(ITEMS[l.id].n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
+        <span class="x">${esc([l.size, ...l.extras].filter(Boolean).join(' · ') || ' ')}</span></div>`).join('') + `<div class="totals"><span>Total</span><span>${aed(total())}</span></div>`;
+      if (cp && !cp.disabled) cp.lastElementChild.textContent = aed(total());
+    }
+  }
   document.getElementById('barCount').textContent = count();
   document.getElementById('barTotal').textContent = aed(total());
 }
@@ -516,32 +539,125 @@ function toast(msg) { const t = document.getElementById('toast'); t.textContent 
 
 /* ---------- Place order: sent to the staff screen ---------- */
 let lastOrder = null;
-async function place(note, name, btn) {
+async function place(info, btn) {
   const lines = cart.map(l => ({ n: ITEMS[l.id].n, qty: l.qty, unit: l.unit, opts: [l.size, ...l.extras].filter(Boolean).join(' · ') }));
   const sum = total(), ref = String(Math.floor(100 + Math.random() * 900));
-  const order = { id: ref + '-' + Date.now().toString(36), ref, table: TABLE, name: AT_TABLE ? '' : name, lines, total: sum, note };
+  const order = Object.assign({ id: ref + '-' + Date.now().toString(36), ref, table: AT_TABLE ? TABLE : null, lines, total: sum }, info);
+  const label = btn.firstElementChild.textContent;
   btn.disabled = true; btn.firstElementChild.textContent = 'Sending…';
   try { await PoffiesLive.order(order); }
-  catch (e) { btn.disabled = false; btn.firstElementChild.textContent = 'Place order'; toast(AT_TABLE ? "Couldn't send your order. Try again, or tell a waiter." : "Couldn't send your order. Please try again."); return; }
-  cart = []; closeLayer(); lastOrder = order;
+  catch (e) { btn.disabled = false; btn.firstElementChild.textContent = label; toast(AT_TABLE ? "Couldn't send your order. Try again, or tell a waiter." : "Couldn't send your order. Check your internet and try again."); return; }
+  cart = []; closeLayer(); lastOrder = order; inCheckout = false;
   if (AT_TABLE) { hasOrdered = true; try { sessionStorage.setItem(ORDERED_KEY, '1'); } catch (e) {} }
   paintWhere(); paintOrder();
   document.getElementById('tools').hidden = true;
-  if (AT_TABLE) showGames(order); else showPickupDone(order);
+  if (AT_TABLE) showGames(order); else showHomeDone(order);
 }
 const receiptHTML = o => `${o.lines.map(l => `<div class="line"><span class="n">${l.qty} × ${esc(l.n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
   <span class="x">${esc(l.opts || ' ')}</span></div>`).join('')}${o.note ? `<p class="note" style="margin-top:10px">Note: ${esc(o.note)}</p>` : ''}
   <div class="totals"><span>Total</span><span>${aed(o.total)}</span></div>`;
 function backToMenu() { document.getElementById('tools').hidden = false; renderMenu(''); window.scrollTo(0, 0); }
 
-function showPickupDone(o) {
+function showHomeDone(o) {
+  const d = o.mode === 'delivery';
   document.getElementById('menu').innerHTML = `<div class="done">
     <div class="tick">✓</div>
-    <div class="ref">Order ${o.ref} · Pickup for ${esc(o.name)}</div>
+    <div class="ref">Order ${o.ref} · ${d ? 'Delivery' : 'Self pickup'}</div>
     <h2>Order received</h2>
-    <p class="lead">We'll call your name at the counter when it's ready. You pay when you collect.</p>
+    <p class="lead">${d ? `We'll call you on ${esc(o.phone)} to confirm, then bring it to ${esc(o.address.area)}.`
+      : `We'll get it ready. Collect it at the counter at Orchid Residence, under the name ${esc(o.name)}. If anything changes we'll call ${esc(o.phone)}.`}</p>
     <div class="receipt">${receiptHTML(o)}</div>
+    ${d ? `<div class="receipt" style="margin-top:12px;padding:14px 18px"><b>Delivering to</b><br>${esc(o.name)} · ${esc(o.phone)}<br>${esc([o.address.building, o.address.flat && 'Flat ' + o.address.flat, o.address.street, o.address.area].filter(Boolean).join(', '))}${o.address.notes ? `<br><span class="note">${esc(o.address.notes)}</span>` : ''}</div>` : ''}
     <button class="again" type="button" onclick="backToMenu()">Back to the menu</button></div>`;
+  window.scrollTo(0, 0);
+}
+
+/* ---------- Checkout for home orders: delivery to an address, or self pickup ---------- */
+let inCheckout = false, coLoc = null;
+const CO_KEY = 'poffies-checkout';
+function savedCheckout() { try { return JSON.parse(localStorage.getItem(CO_KEY) || '{}'); } catch (e) { return {}; } }
+function showCheckout() {
+  if (!cart.length) return;
+  inCheckout = true;
+  const sv = savedCheckout();
+  const mode = sv.mode === 'pickup' ? 'pickup' : 'delivery';
+  document.getElementById('tools').hidden = true;
+  document.getElementById('bar').hidden = true; document.body.classList.remove('has-bar');
+  document.getElementById('menu').innerHTML = `
+    <button class="co-back" type="button" id="coBack">← Back to the menu</button>
+    <form class="checkout" id="coForm" novalidate>
+      <div class="co-card">
+        <h2>Checkout</h2>
+        <p class="hint">How would you like to get your order?</p>
+        <div class="seg">
+          <label><input type="radio" name="mode" id="mode-delivery" value="delivery" ${mode === 'delivery' ? 'checked' : ''}><b>Delivery</b><span>To nearby areas</span></label>
+          <label><input type="radio" name="mode" id="mode-pickup" value="pickup" ${mode === 'pickup' ? 'checked' : ''}><b>Self pickup</b><span>At Orchid Residence</span></label>
+        </div>
+        <div class="row2">
+          <label class="field"><span>Your name</span><input id="coName" name="name" type="text" autocomplete="name" maxlength="40" value="${esc(sv.name || '')}"></label>
+          <label class="field"><span>Mobile number</span><input id="coPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="05X XXX XXXX" value="${esc(sv.phone || '')}"></label>
+        </div>
+        <div id="coAddr">
+          <label class="field"><span>Area</span><input id="coArea" type="text" autocomplete="address-level2" maxlength="60" placeholder="e.g. Dubai Science Park" value="${esc(sv.area || '')}"></label>
+          <div class="row2">
+            <label class="field"><span>Building or villa</span><input id="coBuilding" type="text" autocomplete="address-line1" maxlength="60" value="${esc(sv.building || '')}"></label>
+            <label class="field"><span>Flat · optional</span><input id="coFlat" type="text" maxlength="20" value="${esc(sv.flat || '')}"></label>
+          </div>
+          <label class="field"><span>Street · optional</span><input id="coStreet" type="text" autocomplete="address-line2" maxlength="80" value="${esc(sv.street || '')}"></label>
+          <label class="field"><span>Directions for the driver · optional</span><textarea id="coNotes" rows="2" maxlength="160" placeholder="Gate code, landmark, call on arrival…">${esc(sv.notes || '')}</textarea></label>
+          <button class="locbtn" type="button" id="coLocBtn">Add my exact location (helps the driver)</button>
+        </div>
+        <div id="coPick" class="pickup-note" style="margin-top:12px">Collect at the counter at Orchid Residence, Dubai Science Park. We'll have it ready under your name.</div>
+        <label class="field"><span>Note for the kitchen · optional</span><textarea id="coKitchen" rows="2" maxlength="140" placeholder="Less sugar, no ice, nut allergy…"></textarea></label>
+      </div>
+      <div class="co-card co-sum">
+        <h2>Your order</h2>
+        <div id="coLines"></div>
+        <p class="note" id="coPayNote"></p>
+        <button class="place" type="submit" id="coPlace"><span>Place order</span><span>${aed(total())}</span></button>
+        <button class="again" type="button" id="coEdit" style="width:100%;margin-top:10px">Edit order</button>
+      </div>
+    </form>`;
+  document.getElementById('coLines').innerHTML = cart.map(l => `<div class="line"><span class="n">${l.qty} × ${esc(ITEMS[l.id].n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
+    <span class="x">${esc([l.size, ...l.extras].filter(Boolean).join(' · ') || ' ')}</span></div>`).join('') + `<div class="totals"><span>Total</span><span>${aed(total())}</span></div>`;
+  const f = document.getElementById('coForm');
+  const sync = () => {
+    const del = f.querySelector('input[name=mode]:checked').value === 'delivery';
+    document.getElementById('coAddr').hidden = !del;
+    document.getElementById('coPick').hidden = del;
+    document.getElementById('coPayNote').textContent = del ? 'We call you to confirm your order and delivery time before we send it.' : 'You pay at the counter when you collect.';
+  };
+  f.addEventListener('change', sync); sync();
+  const leave = () => { inCheckout = false; backToMenu(); paintOrder(); };
+  document.getElementById('coBack').onclick = leave;
+  document.getElementById('coEdit').onclick = leave;
+  const lb = document.getElementById('coLocBtn');
+  if (coLoc) { lb.classList.add('ok'); lb.textContent = 'Exact location added ✓'; }
+  lb.onclick = () => {
+    if (!navigator.geolocation) { toast('Location is not available on this device.'); return; }
+    lb.textContent = 'Finding you…';
+    navigator.geolocation.getCurrentPosition(p => { coLoc = { lat: +p.coords.latitude.toFixed(5), lng: +p.coords.longitude.toFixed(5) }; lb.classList.add('ok'); lb.textContent = 'Exact location added ✓'; },
+      () => { lb.textContent = 'Add my exact location (helps the driver)'; toast("Couldn't get your location. The address is enough."); }, { enableHighAccuracy: true, timeout: 10000 });
+  };
+  f.addEventListener('submit', e => {
+    e.preventDefault();
+    const v = id => document.getElementById(id).value.trim();
+    const del = f.querySelector('input[name=mode]:checked').value === 'delivery';
+    f.querySelectorAll('.err').forEach(x => x.remove());
+    const bad = [];
+    const need = (id, msg) => { if (!v(id)) bad.push([id, msg]); };
+    need('coName', 'Please add your name');
+    if (v('coPhone').replace(/\D/g, '').length < 9) bad.push(['coPhone', 'Please add a mobile number we can call']);
+    if (del) { need('coArea', 'Which area should we deliver to?'); need('coBuilding', 'Please add the building or villa'); }
+    if (bad.length) {
+      bad.forEach(([id, msg]) => document.getElementById(id).insertAdjacentHTML('afterend', `<span class="err">${msg}</span>`));
+      document.getElementById(bad[0][0]).focus(); return;
+    }
+    const details = { mode: del ? 'delivery' : 'pickup', name: v('coName'), phone: v('coPhone'), area: v('coArea'), building: v('coBuilding'), flat: v('coFlat'), street: v('coStreet'), notes: v('coNotes') };
+    try { localStorage.setItem(CO_KEY, JSON.stringify(details)); } catch (err) {}   // remembered on this phone for next time
+    place({ mode: details.mode, name: details.name, phone: details.phone, note: v('coKitchen'),
+      address: del ? { area: details.area, building: details.building, flat: details.flat, street: details.street, notes: details.notes, loc: coLoc } : null }, document.getElementById('coPlace'));
+  });
   window.scrollTo(0, 0);
 }
 
@@ -622,7 +738,15 @@ document.getElementById('openOrder').onclick = orderDrawer;
 const q = document.getElementById('q'), qc = document.getElementById('qClear');
 q.addEventListener('input', () => { qc.hidden = !q.value; renderMenu(q.value); });
 qc.onclick = () => { q.value = ''; qc.hidden = true; renderMenu(''); q.focus(); };
-addEventListener('resize', () => { if (isDesk() && document.querySelector('.drawer')) closeLayer(); paintOrder(); });
+/* The phone keyboard opening fires "resize". Redrawing then would throw away the field being typed in,
+   so only react when the layout really switches between laptop and phone/tablet. */
+let wasDesk = isDesk();
+addEventListener('resize', () => {
+  const d = isDesk(); if (d === wasDesk) return; wasDesk = d;
+  if (d && document.querySelector('.drawer')) closeLayer();
+  const typing = document.activeElement && document.activeElement.matches('input, textarea, select');
+  if (!typing) paintOrder();
+});
 
 document.getElementById('gamesBtn').onclick = () => showGames(null);
 renderNav(); renderMenu(''); paintOrder();

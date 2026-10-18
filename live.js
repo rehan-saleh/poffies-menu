@@ -123,7 +123,10 @@
     requestGame: (game, table, by) => send({ t: 'game_req', game, table, by }, { title: `Table ${table} wants a game`, message: `Bring ${GAMES.find(g => g.id === game).n} to table ${table}.`, tags: ['game_die'], priority: 4 }),
     gameGiven: (game, table) => send({ t: 'game_given', game, table }),
     gameBack: game => send({ t: 'game_back', game }),
-    order: o => send(Object.assign({ t: 'order' }, o), { title: o.table ? `New order, table ${o.table}` : `New pickup order for ${o.name}`, message: o.lines.map(l => `${l.qty} x ${l.n}`).join(', ') + ` · ${o.total} AED`, tags: ['coffee'], priority: 4 }),
+    order: o => send(Object.assign({ t: 'order' }, o), {
+      title: o.table ? `New order, table ${o.table}` : o.mode === 'delivery' ? `New delivery for ${o.name}, ${o.address.area}` : `New pickup order for ${o.name}`,
+      message: o.lines.map(l => `${l.qty} x ${l.n}`).join(', ') + ` · ${o.total} AED` + (o.table ? '' : ` · ${o.phone}`),
+      tags: [o.mode === 'delivery' ? 'motor_scooter' : 'coffee'], priority: 4 }),
     served: id => send({ t: 'served', id }),
     reset: () => send({ t: 'reset' })
   };
