@@ -192,7 +192,8 @@ legend { font: 600 .68rem var(--sans); letter-spacing: .2em; text-transform: upp
 .games { margin-top: 34px; text-align: left; }
 .games h2 { font: 400 1.8rem var(--serif); text-transform: uppercase; margin: 0; }
 .games p { margin: 2px 0 14px; font: italic 500 1.15rem var(--script); color: var(--ink-soft); }
-.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.shelf { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 640px) { .shelf { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 .slot { aspect-ratio: 3 / 4; max-width: 100%; border-radius: 14px; border: 2px dashed var(--line); display: grid; place-items: center; text-align: center; padding: 10px; font: 600 .7rem var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
 .again { margin-top: 26px; border: 1.5px solid var(--line); background: transparent; border-radius: 14px; padding: 13px 20px; cursor: pointer; font-weight: 500; }
 
