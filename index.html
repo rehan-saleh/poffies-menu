@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Poffies Menu</title>
-<meta name="theme-color" content="#eab3be">
+<meta name="theme-color" content="#fff6f2">
 <link rel="icon" href="https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/7cc4d0bbe94bf8bdaeb9cad622a82997.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,14 +22,9 @@
   --gl: max(16px, env(safe-area-inset-left, 0px)); --gr: max(16px, env(safe-area-inset-right, 0px));
   color-scheme: light;
 }
-:root[data-theme="dark"] {
-  --bg: #1d1220; --surface: #29192d; --card: #2c1c31; --plate: #3a2641; --ink: #f4e6f1; --ink-soft: #c8abc8; --line: #43304a;
-  --accent: #e6cf96; --accent-ink: #29192d; --gold: #d8b45f; --gold-soft: #8a7340; --velvet: #5b2b49; --velvet-dot: #2a0f20; --velvet-seam: rgba(0, 0, 0, .28);
-  --ok: #8fd0a0; --shadow: rgba(0, 0, 0, .45); color-scheme: dark;
-}
 *, *::before, *::after { box-sizing: border-box; }
 html, body { height: 100%; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.5 var(--sans); }
+body { margin: 0; background: linear-gradient(var(--bg), #fdeef0 70%) fixed; color: var(--ink); font: 400 15px/1.5 var(--sans); }
 img { max-width: 100%; display: block; }
 button { font: inherit; color: inherit; }
 :focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; border-radius: 8px; }
@@ -53,7 +48,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 @media (max-width: 640px) { .band .title, .site-link { display: none; } .band .logo { width: 128px; height: 40px; } }
 
 /* ---------- Shell ---------- */
-.shell { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 220px minmax(0, 1fr) 360px; gap: 28px; padding: 22px var(--gr) 40px var(--gl); align-items: start; }
+.shell { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 210px minmax(0, 1fr) clamp(300px, 26vw, 370px); gap: 28px; padding: 22px var(--gr) 40px var(--gl); align-items: start; }
 .rail, .panel { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; }
 @media (max-width: 1180px) { .shell { grid-template-columns: minmax(0, 1fr); } .rail, .panel { display: none; } }
 
@@ -66,7 +61,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .rail button.on span { color: inherit; opacity: .75; }
 
 /* Search + chips */
-.tools { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--bg); padding-block: 4px 10px; margin-inline: -4px; padding-inline: 4px; }
+.tools { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: linear-gradient(var(--bg) 85%, transparent); padding-block: 4px 10px; margin-inline: -4px; padding-inline: 4px; }
 .search { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px; padding: 0 14px; }
 .search svg { flex: 0 0 auto; width: 18px; height: 18px; stroke: var(--ink-soft); }
 .search input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: 400 1rem var(--sans); padding: 13px 0; outline: none; }
@@ -232,8 +227,6 @@ legend { font: 600 .68rem var(--sans); letter-spacing: .2em; text-transform: upp
 <div id="layer"></div>
 
 <script>
-/* ---------- Night mode on the guest's own clock: 7pm to 6am ---------- */
-(function () { const h = new Date().getHours(); if (h >= 19 || h < 6) document.documentElement.setAttribute('data-theme', 'dark'); })();
 
 /* ---------- Menu data, copied from the Poffies Canva menu (Oct 2026) ---------- */
 const EXTRAS = ['Extra Shot','Vanilla Syrup','Hazelnut Syrup','Caramel Syrup','Caramel Sauce','Chocolate Sauce','Whipped Cream','Sweet Cold Foam','Oat Milk','Almond Milk','Soy Milk','Lactose Free Milk'].map(n => ({ n, p: 5 }));
