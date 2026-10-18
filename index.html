@@ -369,7 +369,7 @@ let hasOrdered = false;
 try { hasOrdered = AT_TABLE && sessionStorage.getItem(ORDERED_KEY) === '1'; } catch (e) {}
 function paintWhere() {
   document.getElementById('where').hidden = false;
-  document.getElementById('whereTxt').textContent = AT_TABLE ? 'Table ' + TABLE : 'Pickup order';
+  document.getElementById('whereTxt').textContent = AT_TABLE ? 'Table ' + TABLE : 'Delivery or pickup';
   document.getElementById('gamesBtn').hidden = !(AT_TABLE && hasOrdered);
 }
 paintWhere();
@@ -440,7 +440,7 @@ function orderHTML() {
     <div class="none"><div class="cup">P</div>Nothing here yet.<br>Tap <b>+</b> on anything you fancy.</div></div>`;
   return `<div class="order">
     <h3>Your order</h3>
-    <p class="sub">${AT_TABLE ? 'For table ' + TABLE : 'Pickup at the counter'}</p>
+    <p class="sub">${AT_TABLE ? 'For table ' + TABLE : 'Delivery or self pickup, you choose at checkout'}</p>
     ${cart.map((l, i) => `<div class="line">
       <span class="n">${esc(ITEMS[l.id].n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
       <span class="x">${esc([l.size, ...l.extras].filter(Boolean).join(' · ') || aed(l.unit) + ' each')}</span>
