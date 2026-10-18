@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fcefea">
+<style>*,*::before,*::after{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,sans-serif}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Poffies Table Menu</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Gilda+Display&family=Cormorant+Garamond:ital,wght@1,500&family=Jost:wght@400;500;600&display=swap">
+<style>
+/* Layout: one phone-width column like their Canva menu, sticky category chips, cart bar fixed to the bottom */
+:root {
+  --ground: #d9cdd0;      /* outside the menu column */
+  --paper: #fcefea;       /* menu column */
+  --card: #ead9e5;        /* item cards */
+  --ink: #6a3a6d;         /* plum headings */
+  --ink-soft: #7d5a7f;    /* descriptions */
+  --accent: #9a6aa0;      /* prices, buttons */
+  --accent-ink: #ffffff;
+  --line: #dcc6d6;
+  --logo: #b79bd0;
+  --font-logo: "Fredoka", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --font-name: "Gilda Display", Georgia, "Times New Roman", serif;
+  --font-desc: "Cormorant Garamond", Georgia, serif;
+  --font-ui: "Jost", "Segoe UI", system-ui, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --ground: #120c14; --paper: #1d1420; --card: #2b1f30; --ink: #ead6ee; --ink-soft: #c6adc9;
+  --accent: #c9a2d0; --accent-ink: #1d1420; --line: #3d2e43; --logo: #c7aedc; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --ground: #120c14; --paper: #1d1420; --card: #2b1f30; --ink: #ead6ee; --ink-soft: #c6adc9;
+  --accent: #c9a2d0; --accent-ink: #1d1420; --line: #3d2e43; --logo: #c7aedc; color-scheme: dark }
+
+html, body { height: 100%; }
+body { background: var(--ground); color: var(--ink); font-family: var(--font-ui); }
+.col { max-width: 460px; margin: 0 auto; min-height: 100%; background: var(--paper);
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 120px; }
+
+header.brand { text-align: center; padding-block: 28px 8px; }
+.logo { font-family: var(--font-logo); font-weight: 700; font-size: 3.1rem; letter-spacing: 0.04em; color: var(--logo); line-height: 1;
+  text-shadow: 0 2px 0 color-mix(in srgb, var(--ink) 35%, transparent); }
+.tag { font-family: var(--font-ui); font-size: 0.68rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--ink-soft); margin-top: 8px; }
+.sub { font-family: var(--font-desc); font-style: italic; font-size: 1.05rem; color: var(--ink-soft); margin-top: 6px; }
+.table-pill { display: inline-block; margin-top: 12px; padding: 5px 14px; border-radius: 999px; border: 1px solid var(--line);
+  font-size: 0.8rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink); }
+
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+nav.chips { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--paper);
+  display: flex; gap: 8px; overflow-x: auto; padding-block: 10px; margin-inline: -4px; padding-inline: 4px; scrollbar-width: none; }
+nav.chips::-webkit-scrollbar { display: none; }
+.chip { flex: 0 0 auto; border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 999px;
+  padding: 7px 13px; font: 500 0.8rem var(--font-ui); letter-spacing: 0.04em; cursor: pointer; }
+.chip.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+section.cat { padding-top: 22px; scroll-margin-top: 64px; }
+.cat h2 { font-family: var(--font-name); font-weight: 400; font-size: 1.85rem; text-transform: uppercase; letter-spacing: 0.02em; margin: 0; text-wrap: balance; }
+.cat .blurb { font-family: var(--font-desc); font-style: italic; color: var(--ink-soft); margin: 2px 0 12px; font-size: 1.02rem; }
+.list { display: grid; gap: 10px; }
+
+.item { display: grid; grid-template-columns: 76px 1fr auto; gap: 12px; align-items: center; background: var(--card);
+  border-radius: 10px; padding: 10px 12px 10px 10px; border: 0; width: 100%; text-align: left; color: inherit; cursor: pointer; font: inherit; }
+.item:focus-visible, .chip:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.thumb { width: 76px; height: 76px; border-radius: 8px; overflow: hidden; display: grid; place-items: center;
+  background: color-mix(in srgb, var(--paper) 55%, var(--card)); }
+.thumb img { width: 100%; height: 100%; object-fit: contain; }
+.thumb .mono { font-family: var(--font-name); font-size: 1.6rem; color: var(--accent); }
+.item .txt { min-width: 0; }
+.item .name { font-family: var(--font-name); font-size: 1.02rem; text-transform: uppercase; letter-spacing: 0.02em; line-height: 1.2; }
+.item .desc { font-family: var(--font-desc); font-style: italic; color: var(--ink-soft); font-size: 0.98rem; margin-top: 2px; }
+.item .side { display: grid; justify-items: end; gap: 8px; }
+.price { font: 600 0.82rem var(--font-ui); color: var(--accent); letter-spacing: 0.06em; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.add { width: 30px; height: 30px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 1.2rem; line-height: 1; }
+.qty-badge { font: 600 0.72rem var(--font-ui); color: var(--accent-ink); background: var(--ink); border-radius: 999px; padding: 2px 7px; }
+
+/* cart bar */
+.cartbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; display: flex; justify-content: center;
+  padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); pointer-events: none; }
+.cartbar button { pointer-events: auto; width: 100%; max-width: 428px; display: flex; justify-content: space-between; align-items: center;
+  background: var(--ink); color: var(--paper); border: 0; border-radius: 14px; padding: 15px 18px; font: 500 0.95rem var(--font-ui); cursor: pointer;
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--ink) 30%, transparent); }
+
+/* sheets */
+.scrim { position: fixed; inset: 0; z-index: 30; background: color-mix(in srgb, #000 45%, transparent); display: flex; align-items: flex-end; justify-content: center; }
+.sheet { width: 100%; max-width: 460px; max-height: 88%; overflow-y: auto; background: var(--paper); border-radius: 18px 18px 0 0;
+  padding: 20px max(18px, env(safe-area-inset-right, 0px)) calc(20px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px)); }
+.sheet h3 { font-family: var(--font-name); font-weight: 400; font-size: 1.5rem; text-transform: uppercase; margin: 0; }
+.sheet .desc { font-family: var(--font-desc); font-style: italic; color: var(--ink-soft); font-size: 1.05rem; }
+.hero-img { height: 170px; display: grid; place-items: center; background: var(--card); border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
+.hero-img img { height: 100%; object-fit: contain; }
+.hero-img .mono { font-family: var(--font-name); font-size: 3rem; color: var(--accent); }
+fieldset { border: 0; padding: 0; margin: 16px 0 0; display: grid; gap: 8px; }
+legend { font: 600 0.72rem var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
+.opt { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; font-size: 0.95rem; }
+.opt input { accent-color: var(--accent); margin-right: 10px; }
+.opt span:first-child { display: flex; align-items: center; }
+.opt .p { color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.row { display: flex; align-items: center; gap: 12px; margin-top: 18px; }
+.stepper { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 12px; }
+.stepper button { width: 42px; height: 46px; border: 0; background: transparent; color: var(--ink); font-size: 1.3rem; cursor: pointer; }
+.stepper output { min-width: 26px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+.primary { flex: 1; border: 0; border-radius: 12px; background: var(--accent); color: var(--accent-ink); padding: 14px 16px; font: 600 0.95rem var(--font-ui); cursor: pointer; display: flex; justify-content: space-between; }
+.primary[disabled] { opacity: 0.45; cursor: not-allowed; }
+.ghost { border: 1px solid var(--line); background: transparent; color: var(--ink); border-radius: 12px; padding: 12px 16px; font: 500 0.9rem var(--font-ui); cursor: pointer; }
+
+.cline { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; padding-block: 12px; border-bottom: 1px solid var(--line); }
+.cline .n { font-family: var(--font-name); text-transform: uppercase; font-size: 0.98rem; }
+.cline .x { color: var(--ink-soft); font-size: 0.84rem; grid-column: 1; }
+.cline .lp { font-weight: 600; color: var(--accent); font-variant-numeric: tabular-nums; }
+.cline .ctl { grid-column: 2; grid-row: 2; display: flex; gap: 6px; justify-self: end; }
+.cline .ctl button { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--line); background: transparent; color: var(--ink); cursor: pointer; }
+.total { display: flex; justify-content: space-between; padding-block: 14px 4px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.note { font-size: 0.82rem; color: var(--ink-soft); }
+label.field { display: grid; gap: 6px; margin-top: 14px; font: 600 0.72rem var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-soft); }
+select, textarea { font: 400 0.95rem var(--font-ui); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+
+/* confirmation + games */
+.done { text-align: center; padding-block: 34px 10px; }
+.done .big { font-family: var(--font-name); font-size: 2rem; text-transform: uppercase; margin: 6px 0; }
+.done .num { font: 600 0.8rem var(--font-ui); letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase; }
+.receipt { background: var(--card); border-radius: 12px; padding: 6px 14px 12px; margin-top: 18px; text-align: left; }
+.games { margin-top: 28px; }
+.games h2 { font-family: var(--font-name); font-weight: 400; font-size: 1.6rem; text-transform: uppercase; margin: 0; }
+.shelf { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 12px; }
+.slot { aspect-ratio: 3/4; max-width: 100%; border-radius: 10px; border: 1.5px dashed var(--line); display: grid; place-items: center;
+  font: 500 0.72rem var(--font-ui); letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-soft); }
+footer { text-align: center; padding-top: 26px; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+@media (prefers-reduced-motion: no-preference) { .sheet { animation: up .22s ease-out; } @keyframes up { from { transform: translateY(24px); opacity: .6 } } }
+</style>
+
+</head>
+<body>
+<div class="col" id="app">
+  <header class="brand">
+    <div class="logo" aria-label="Poffies">POFFIES</div>
+    <div class="tag">Poffies &amp; Coffee Shop</div>
+    <div class="sub">Made with love, for sweet moments</div>
+    <div class="table-pill" id="tablePill" hidden></div>
+  </header>
+  <nav class="chips" id="chips" aria-label="Menu sections"></nav>
+  <main id="menu"></main>
+  <footer>@poffiescafe · Orchid Residence, Dubai</footer>
+</div>
+<div class="cartbar" id="cartbar" hidden><button id="openCart" type="button"><span id="cartCount"></span><span id="cartTotal"></span></button></div>
+<div id="layer"></div>
+
+<script>
+/* ---------- Theme: dark between 7pm and 6am on the guest's phone ---------- */
+(function () {
+  const h = new Date().getHours();
+  document.documentElement.setAttribute('data-theme', (h >= 19 || h < 6) ? 'dark' : 'light');
+})();
+
+/* ---------- Menu data, copied from the Poffies Canva menu (Oct 2026) ---------- */
+const EXTRAS = ['Extra Shot','Vanilla Syrup','Hazelnut Syrup','Caramel Syrup','Caramel Sauce','Chocolate Sauce','Whipped Cream','Sweet Cold Foam','Oat Milk','Almond Milk','Soy Milk','Lactose Free Milk'].map(n => ({ n, p: 5 }));
+const POFF_SIZES = [{ n: '9 pcs', p: 32 }, { n: 'Box of 16', p: 48 }, { n: '30 pcs', p: 82 }, { n: 'Box of 60', p: 145 }];
+
+const MENU = [
+  { id: 'hot', t: 'Hot Coffees', b: 'Classic hot espresso drinks', extras: true, items: [
+    ['Single Espresso','Rich & Intense',14],['Double Espresso','Bold & Rich',18],['Americano','Smooth & Bold',18],['Cappuccino','Creamy & Foamy',19],
+    ['Dry Cappuccino','Foamy & Bold',23],['Latte','Smooth & Creamy',22],['Flat White','Velvety & Smooth',24],['Cortado','Rich & Balanced',19],
+    ['Piccolo','Bold & Creamy',18],['Spanish Latte','Bold & Creamy',24],['Cinnamon Latte','Warm & Spiced',24],['Hot Chocolate','Rich & Creamy',23],
+    ['Mocha','Chocolatey & Smooth',23],['White Mocha','Sweet & Velvety',24],['Macchiato','Bold & Smooth',18],['Caramel Macchiato','Caramel & Creamy',20],
+    ['V60','Refined & Aromatic',28]] },
+  { id: 'iced', t: 'Iced Coffees', b: 'Classic cold espresso drinks', extras: true, items: [
+    ['Iced Americano','Rich & Intense',22],['Iced Latte','Chilled & Creamy',24],['Iced Spanish Latte','Sweet & Refreshing',26],['Iced Cinnamon Latte','Chilled & Spiced',26],
+    ['Iced Mocha','Chocolatey & Chilled',25],['Iced White Mocha','Sweet & Velvety',26],['Iced Macchiato','Bold & Creamy',22],['Iced Caramel Macchiato','Sweet & Caramelized',24],
+    ['Iced Cold Brew','Bold & Refreshing',24],['Iced V60','Aromatic & Elevated',32]] },
+  { id: 'sig', t: 'Signature Drinks', b: 'Our most beloved drinks', extras: true, items: [
+    ['Oh My Fig Latte','Sweet & Figgy',30],['Maple Kiss Latte','Warm & Cozy',30],['Crush On Blush Latte','Floral & Creamy',29],['Zesty Hot Cocoa','Orange Goodness',28],
+    ['Jasmin Midnight Iced Latte','Floral & Mysterious',32],['Silky Pistachio Iced Latte','Nutty & Silky',32],['Rose Velvet Iced Latte','Velvety & Floral',30],['Orange Cloud Iced Latte','Sweet & Citrusy',32]] },
+  { id: 'matcha', t: 'Matcha', b: 'Ceremonial grade matcha favourites', items: [
+    ['Hot Matcha Latte','Ceremonial Grade Matcha & Milk',23],['Iced Matcha Latte','Ceremonial Grade Matcha & Milk',24],['Passion Iced Matcha Latte','Matcha & Touch of Passion',27],
+    ['Strawberry Iced Matcha Latte','Matcha & Touch of Strawberries',27],['Mango-Coco Matcha Cloud','Mango, Coconut & Crispy Rice',36],['Maple-Berry Matcha Cloud','Strawberry, Maple & Crispy Biscuit',36]] },
+  { id: 'poffies', t: 'Signature Poffies', b: 'Little bites made to crave', group: 'Poffies', sizes: POFF_SIZES, items: [
+    ['Choco-Loco','Hazelnut & White Chocolate'],['Cookie N’Creme','Oreo Crumble & White Chocolate'],['Maple Drip','Canadian Maple Syrup & Pecan'],['Biscoff Crumble','Lotus Biscoff Sauce & Biscuits'],
+    ['Caramel Cheesecake','Caramel & Cheesecake Sauce'],['Strawberry Shortcake','Strawberry & Cheesecake Sauce'],['Cinnaswirl','Sugar & Cinnamon'],['Pistachio Dream','Pistachio Sauce & White Chocolate'],
+    ['Nutty Date','Dates, Honey & Walnuts'],['Kinderella','Kinder Chocolate Sauce']] },
+  { id: 'poffertjes', t: 'Signature Poffertjes', b: 'Freshly made Dutch mini pancakes', group: 'Poffertjes', sizes: POFF_SIZES, items: [
+    ['Biscoff Crunch','Biscoff Sauce & Biscuits'],['Strawberry Shortcake','Strawberry & Cheesecake Sauce'],['Maple Leaf','Canadian Original Maple Syrup'],
+    ['Choco-Loco','Hazelnut Chocolate, Strawberries & Banana'],['Kinderella','Kinder Chocolate Sauce & Strawberries'],['Caramel Cheesecake','Caramel & Cheesecake Sauce']] },
+  { id: 'croffles', t: 'Signature Croffles', b: 'Flaky, crispy & dreamy', group: 'Croffle', sizes: [{ n: '1 pc', p: 30 }, { n: 'Box of 3', p: 80 }], items: [
+    ['Kinderella','Mascarpone & Kinder Cream'],['Oreo Crush','Mascarpone & Oreo Cream'],['Strawberry Matcha','Mascarpone & Matcha Cream'],
+    ['Choco-Nana','Mascarpone & Nutella'],['Blisscoff','Mascarpone & Lotus Biscoff Cream'],['Pistachio Crunch','Mascarpone & Pistachio Cream']] },
+  { id: 'pastry', t: 'Fresh Pastries', b: 'Freshly baked every day with love', items: [
+    ['Croissant','Fresh Butter Croissant',15],['Cheese Croissant','Butter Cheese Croissant',17],['Pain au Chocolat','Chocolate Croissant',15],
+    ['Chocolate Chip Vanilla Muffin','Vanilla & Chocolate Goodness',15],['Triple Chocolate Muffin','Decadent Chocolate Muffin',16],['Blueberry Muffin','Fresh Blueberries Muffin',15],
+    ['Brownie Bomb','Fudgy Decadent Brownie',19],['Hazelnut Bliss Cookie','Hazelnut Chunks & Chocolate',19],['Macadamia Dream Cookie','Macadamia Nuts & White Chocolate',20],
+    ['Dark Melt Cookie','Dark Chocolate & Sea Salt Flakes',20]] },
+  { id: 'refresh', t: 'Refreshers', b: 'Your daily refreshing dose', items: [
+    ['Golden Lemonade','Tropical Vibe',24],['Pink Lemonade','Strawberry Goodness',23],['Strawberry Crush Mojito','Fresh Berry',25],['Passion Burst Mojito','Passion Lime',25],
+    ['Mint Margarita','Zesty & Refreshing',25],['Passion Splash Iced Tea','Refreshing & Vibrant',24],['Strawberry Kiss Iced Tea','Fruity Iced Tea',25],['Lavender Bloom Iced Tea','Lavender Bliss',28]] },
+  { id: 'sigref', t: 'Signature Refreshers', b: 'Sip the unexpected', items: [
+    ['Bloomberry','Mixed Berries Refresher',30],['Roseberry Bloom','Chilled & Floral',32],['Green Crisp','Fresh Cucumber',28],['Ruby Fizz','Pomegranate Goodness',30]] },
+  { id: 'smooth', t: 'Smoothies', b: 'Blended goodness', items: [
+    ['Tropical Rush Smoothie','Tropical & Creamy',30],['Coco Avocado Smoothie','Creamy & Coconuty',29],['Mango Dragon Smoothie','Sweet & Refreshing',32],
+    ['Green Glow Smoothie','Fresh Boost',32],['Berry Bliss Smoothie','Lovely Blend',30]] },
+  { id: 'shake', t: 'Milkshake & Frappe', b: 'Creamy, indulgent & delicious', items: [
+    ['Vanilla Cloud Milkshake','Sweet & Creamy',23],['Berry-Blush Milkshake','Fruity & Smooth',25],['Choco-Loco Milkshake','Creamy & Chocolatey',28],
+    ['Pista’o Clock Milkshake','Nutty & Luxurious',32],['Coffee Kick Frappe','',28],['Waferlicious Frappe','Crunchy Hazelnut',25],['Bean-Me-Up Coffee Frappe','Bold & Energizing',26]] },
+  { id: 'tea', t: 'Tea', b: 'Comforting selection of classic tea', items: [
+    ['Majestic Earl Grey','Sicilian Bergamot, Orange & Black Tea',25],['Organic English Breakfast','Malty Assam, Fruity Ceylon & Honeyed Yunnan',25],
+    ['Organic Chamomile Cooler','Whole Chamomile Flowers & Peppermint',25],['Organic Mint Duo','North African Nana Mint & Peppermint',25],
+    ['Moroccan Mint','Gunpowder & Moroccan Nana Mint Leaves',25],['Rose White','Pai Mu Tan White Tea & Rose Petals',25],['Rush Hour Berry','Garden & Forest Berries',25],
+    ['Organic Masala Spice Chai','Indian Black Teas & Masala Spices',25],['Organic Ginger Breeze','Lemongrass, Orange Peel & Ginger',25],['Organic Spring Mao Feng','Smooth & elegant, soft nutty notes',25]] }
+];
+
+/* Photos: filled in once the image pack is added. Key = item id. */
+const PHOTOS = {};
+
+/* ---------- Build lookups ---------- */
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const ITEMS = {};
+MENU.forEach(c => c.items.forEach(([n, d, p]) => {
+  const id = c.id + '-' + slug(n);
+  ITEMS[id] = { id, cat: c, n: c.group ? n + ' ' + c.group : n, short: n, d, p: c.sizes ? c.sizes[0].p : p, sizes: c.sizes, extras: !!c.extras };
+}));
+
+/* ---------- Table number from the QR link, e.g. ...#table4 ---------- */
+let TABLE = null;
+const m = (location.hash || '').match(/table(\d{1,2})/i);
+if (m && +m[1] >= 1 && +m[1] <= 11) TABLE = +m[1];
+const pill = document.getElementById('tablePill');
+function showTable() { if (TABLE) { pill.textContent = 'Table ' + TABLE; pill.hidden = false; } }
+showTable();
+
+/* ---------- Cart ---------- */
+let cart = []; // { key, id, size, extras[], qty, unit }
+const aed = n => n + ' AED';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const mono = n => n.replace(/[^A-Za-z]/g, '').charAt(0);
+const thumb = (it, cls) => PHOTOS[it.id] ? `<img src="${PHOTOS[it.id]}" alt="">` : `<span class="mono">${mono(it.short)}</span>`;
+
+function qtyOf(id) { return cart.filter(l => l.id === id).reduce((a, l) => a + l.qty, 0); }
+
+function renderMenu() {
+  document.getElementById('chips').innerHTML = MENU.map((c, i) => `<button class="chip${i ? '' : ' on'}" type="button" data-go="${c.id}">${esc(c.t)}</button>`).join('');
+  document.getElementById('menu').innerHTML = MENU.map(c => `
+    <section class="cat" id="cat-${c.id}">
+      <h2>${esc(c.t)}</h2>
+      <p class="blurb">${esc(c.b)}${c.sizes ? ' · from ' + aed(c.sizes[0].p) : ''}</p>
+      <div class="list">${c.items.map(([n]) => itemCard(ITEMS[c.id + '-' + slug(n)])).join('')}</div>
+    </section>`).join('');
+}
+function itemCard(it) {
+  const q = qtyOf(it.id);
+  return `<button class="item" type="button" data-item="${it.id}">
+    <span class="thumb">${thumb(it)}</span>
+    <span class="txt"><span class="name">${esc(it.short)}</span>${it.d ? `<span class="desc" style="display:block">${esc(it.d)}</span>` : ''}</span>
+    <span class="side"><span class="price">${it.sizes ? 'from ' : ''}${aed(it.p)}</span>${q ? `<span class="qty-badge">${q} in order</span>` : '<span class="add" aria-hidden="true">+</span>'}</span>
+  </button>`;
+}
+function refreshCard(id) {
+  const el = document.querySelector(`[data-item="${id}"]`);
+  if (el) el.outerHTML = itemCard(ITEMS[id]);
+}
+function renderCartBar() {
+  const n = cart.reduce((a, l) => a + l.qty, 0);
+  const t = cart.reduce((a, l) => a + l.qty * l.unit, 0);
+  document.getElementById('cartbar').hidden = n === 0;
+  document.getElementById('cartCount').textContent = `View order · ${n} item${n === 1 ? '' : 's'}`;
+  document.getElementById('cartTotal').textContent = aed(t);
+}
+
+/* ---------- Sheets ---------- */
+const layer = document.getElementById('layer');
+function openSheet(html, onBind) {
+  layer.innerHTML = `<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`;
+  document.getElementById('scrim').addEventListener('click', e => { if (e.target.id === 'scrim') closeSheet(); });
+  onBind && onBind(layer.querySelector('.sheet'));
+}
+function closeSheet() { layer.innerHTML = ''; }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSheet(); });
+
+function itemSheet(id) {
+  const it = ITEMS[id];
+  let qty = 1;
+  openSheet(`
+    <div class="hero-img">${PHOTOS[id] ? `<img src="${PHOTOS[id]}" alt="">` : `<span class="mono">${mono(it.short)}</span>`}</div>
+    <h3>${esc(it.n)}</h3>
+    ${it.d ? `<div class="desc">${esc(it.d)}</div>` : ''}
+    ${it.sizes ? `<fieldset><legend>Choose size</legend>${it.sizes.map((s, i) => `
+      <label class="opt"><span><input type="radio" name="size" id="size-${i}" value="${i}" ${i ? '' : 'checked'}>${esc(s.n)}</span><span class="p">${aed(s.p)}</span></label>`).join('')}</fieldset>` : ''}
+    ${it.extras ? `<fieldset><legend>Extras · optional</legend>${EXTRAS.map((x, i) => `
+      <label class="opt"><span><input type="checkbox" name="extra" id="extra-${i}" value="${i}">${esc(x.n)}</span><span class="p">+${aed(x.p)}</span></label>`).join('')}</fieldset>` : ''}
+    <div class="row">
+      <div class="stepper"><button type="button" id="minus" aria-label="One less">−</button><output id="qty">1</output><button type="button" id="plus" aria-label="One more">+</button></div>
+      <button class="primary" type="button" id="addBtn"><span>Add to order</span><span id="addPrice"></span></button>
+    </div>`, sheet => {
+    const unit = () => {
+      const s = it.sizes ? it.sizes[+sheet.querySelector('input[name=size]:checked').value].p : it.p;
+      const ex = [...sheet.querySelectorAll('input[name=extra]:checked')].reduce((a, c) => a + EXTRAS[+c.value].p, 0);
+      return s + ex;
+    };
+    const paint = () => { sheet.querySelector('#qty').textContent = qty; sheet.querySelector('#addPrice').textContent = aed(unit() * qty); };
+    sheet.addEventListener('change', paint);
+    sheet.querySelector('#minus').onclick = () => { qty = Math.max(1, qty - 1); paint(); };
+    sheet.querySelector('#plus').onclick = () => { qty = Math.min(20, qty + 1); paint(); };
+    sheet.querySelector('#addBtn').onclick = () => {
+      const size = it.sizes ? it.sizes[+sheet.querySelector('input[name=size]:checked').value].n : null;
+      const extras = [...sheet.querySelectorAll('input[name=extra]:checked')].map(c => EXTRAS[+c.value].n);
+      const key = [id, size, extras.join('|')].join('#');
+      const line = cart.find(l => l.key === key);
+      if (line) line.qty += qty; else cart.push({ key, id, size, extras, qty, unit: unit() });
+      closeSheet(); refreshCard(id); renderCartBar();
+    };
+    paint();
+  });
+}
+
+function cartSheet() {
+  if (!cart.length) { closeSheet(); return; }
+  const total = cart.reduce((a, l) => a + l.qty * l.unit, 0);
+  openSheet(`
+    <h3>Your order</h3>
+    <div>${cart.map((l, i) => `
+      <div class="cline">
+        <span class="n">${l.qty} × ${esc(ITEMS[l.id].n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
+        <span class="x">${esc([l.size, ...l.extras].filter(Boolean).join(' · ') || ' ')}</span>
+        <span class="ctl"><button type="button" data-dec="${i}" aria-label="One less">−</button><button type="button" data-inc="${i}" aria-label="One more">+</button></span>
+      </div>`).join('')}</div>
+    <div class="total"><span>Total</span><span>${aed(total)}</span></div>
+    <p class="note">Prices include VAT as shown on the menu. You pay at the counter.</p>
+    ${TABLE ? '' : `<label class="field" for="tableSel">Your table<select id="tableSel"><option value="">Choose your table</option>${Array.from({ length: 11 }, (_, k) => `<option value="${k + 1}">Table ${k + 1}</option>`).join('')}</select></label>`}
+    <label class="field" for="noteIn">Note for the kitchen · optional<textarea id="noteIn" rows="2" maxlength="140" placeholder="Less sugar, no ice, nut allergy…"></textarea></label>
+    <div class="row"><button class="ghost" type="button" id="more">Add more</button><button class="primary" type="button" id="place"><span>Place order</span><span>${aed(total)}</span></button></div>
+  `, sheet => {
+    const sel = sheet.querySelector('#tableSel');
+    const btn = sheet.querySelector('#place');
+    const gate = () => { btn.disabled = !TABLE && !(sel && sel.value); };
+    sel && sel.addEventListener('change', gate); gate();
+    sheet.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => { cart[+b.dataset.inc].qty++; afterChange(cart[+b.dataset.inc].id); });
+    sheet.querySelectorAll('[data-dec]').forEach(b => b.onclick = () => {
+      const l = cart[+b.dataset.dec]; l.qty--; if (l.qty <= 0) cart.splice(+b.dataset.dec, 1); afterChange(l.id);
+    });
+    sheet.querySelector('#more').onclick = closeSheet;
+    btn.onclick = () => {
+      if (!TABLE && sel) TABLE = +sel.value;
+      placeOrder(sheet.querySelector('#noteIn').value.trim());
+    };
+  });
+}
+function afterChange(id) { refreshCard(id); renderCartBar(); cartSheet(); }
+
+/* ---------- Order placed: summary + board games ---------- */
+function placeOrder(note) {
+  const lines = cart.slice();
+  const total = lines.reduce((a, l) => a + l.qty * l.unit, 0);
+  const ref = String(Math.floor(100 + Math.random() * 900));
+  closeSheet();
+  cart = [];
+  renderCartBar(); showTable();
+  document.getElementById('chips').hidden = true;
+  document.getElementById('menu').innerHTML = `
+    <div class="done">
+      <div class="num">Order ${ref} · Table ${TABLE}</div>
+      <div class="big">Order received</div>
+      <p class="note">Sit back, we're making it now. Pay at the counter when you're ready.</p>
+      <div class="receipt">${lines.map(l => `
+        <div class="cline"><span class="n">${l.qty} × ${esc(ITEMS[l.id].n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
+        <span class="x">${esc([l.size, ...l.extras].filter(Boolean).join(' · ') || ' ')}</span></div>`).join('')}
+        ${note ? `<p class="note">Note: ${esc(note)}</p>` : ''}
+        <div class="total"><span>Total</span><span>${aed(total)}</span></div>
+      </div>
+    </div>
+    <section class="games" id="games">
+      <h2>Play while you wait</h2>
+      <p class="blurb" style="font-family:var(--font-desc);font-style:italic;color:var(--ink-soft);margin:2px 0 0">Pick a board game from our shelf and we'll bring it to your table.</p>
+      <div class="shelf">${Array.from({ length: 6 }, () => '<div class="slot">Game coming soon</div>').join('')}</div>
+    </section>
+    <div class="row"><button class="ghost" type="button" id="again" style="flex:1">Back to menu</button></div>`;
+  document.getElementById('again').onclick = () => { document.getElementById('chips').hidden = false; renderMenu(); window.scrollTo(0, 0); };
+  window.scrollTo(0, 0);
+}
+
+/* ---------- Events ---------- */
+document.addEventListener('click', e => {
+  const it = e.target.closest('[data-item]'); if (it) return itemSheet(it.dataset.item);
+  const go = e.target.closest('[data-go]');
+  if (go) {
+    document.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === go));
+    document.getElementById('cat-' + go.dataset.go).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+});
+document.getElementById('openCart').onclick = cartSheet;
+renderMenu(); renderCartBar();
+</script>
+
+</body>
+</html>
