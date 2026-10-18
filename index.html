@@ -137,6 +137,8 @@ section.cat { padding-top: 26px; scroll-margin-top: 130px; }
 .bar button { pointer-events: auto; width: min(100%, 560px); display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 0; border-radius: 16px; background: var(--accent); color: var(--accent-ink); padding: 15px 20px; font: 600 1rem var(--sans); cursor: pointer; box-shadow: 0 12px 30px -10px var(--shadow); }
 .bar .count { background: var(--accent-ink); color: var(--accent); border-radius: 999px; padding: 1px 9px; margin-right: 8px; font-size: .85rem; }
 @media (min-width: 1181px) { .bar { display: none; } }
+/* reserve room under the last item while the order bar floats over the page */
+@media (max-width: 1180px) { body.has-bar .shell { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); } }
 
 /* ---------- Layer: modal (desktop), drawer (tablet), sheet (phone) ---------- */
 .scrim { position: fixed; inset: 0; z-index: 40; background: rgba(20, 8, 22, .5); display: flex; align-items: center; justify-content: center; padding: 20px; }
@@ -418,6 +420,7 @@ function paintOrder() {
   if (drawer) { if (!cart.length) closeLayer(); else { drawer.innerHTML = `<button class="x-close" type="button" data-close aria-label="Close">×</button>` + orderHTML(); bindOrder(drawer); } }
   const n = document.getElementById('noteIn'); if (n && keepNote) n.value = keepNote;
   document.getElementById('bar').hidden = !cart.length || isDesk();
+  document.body.classList.toggle('has-bar', cart.length > 0);
   document.getElementById('barCount').textContent = count();
   document.getElementById('barTotal').textContent = aed(total());
 }
