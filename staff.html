@@ -126,7 +126,7 @@ h2 .n { font: 600 .8rem var(--sans); background: var(--accent); color: var(--acc
 <script>
 const L = PoffiesLive;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const ago = ts => { const m = Math.max(0, Math.round((Date.now() - ts) / 60000)); return m < 1 ? 'just now' : m === 1 ? '1 min ago' : m + ' min ago'; };
+const ago = ts => { const m = Math.max(0, Math.round((PoffiesLive.now() - ts) / 60000)); return m < 1 ? 'just now' : m === 1 ? '1 min ago' : m + ' min ago'; };
 const box = g => `<div class="box" style="background:${g.c}">${L.art(g)}</div>`;
 let seen = null, showDone = false;
 

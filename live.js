@@ -84,6 +84,7 @@
 
   /* ---------- Connect: replay history, then stay live ---------- */
   let es = null, connected = false;
+  let skew = 0; // this device's clock minus the server's, so 'x min ago' is right even on a wrong clock
   async function connect() {
     try {
       const txt = await fetch(`${HOST}/${EVENTS}/json?poll=1&since=12h`, { cache: 'no-store' }).then(r => r.text());
@@ -98,6 +99,8 @@
     const since = state.lastId ? `?since=${state.lastId}` : '';
     es = new EventSource(`${HOST}/${EVENTS}/sse${since}`);
     es.onmessage = ev => { if (ingest(ev.data)) emit(); };
+    const sync = ev => { try { const m = JSON.parse(ev.data); if (m.time) { skew = Date.now() - m.time * 1000; emit(); } } catch (e) {} };
+    es.addEventListener('open', sync); es.addEventListener('keepalive', sync);
     es.onopen = () => { connected = true; emit(); };
     es.onerror = () => { connected = false; emit(); };
   }
@@ -113,6 +116,7 @@
   window.PoffiesLive = {
     GAMES, art, ALERTS,
     get state() { return state; }, get connected() { return connected; },
+    now: () => Date.now() - skew,
     connect, on(fn) { listeners.add(fn); return () => listeners.delete(fn); },
     gameById: id => GAMES.find(g => g.id === id),
     tableGame(table) { const id = Object.keys(state.games).find(k => state.games[k].table === table); return id ? Object.assign({ id }, state.games[id]) : null; },
