@@ -142,6 +142,7 @@ section.cat { padding-top: 26px; scroll-margin-top: 130px; }
 
 /* ---------- Layer: modal (desktop), drawer (tablet), sheet (phone) ---------- */
 .scrim { position: fixed; inset: 0; z-index: 40; background: rgba(20, 8, 22, .5); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.dialog.small { width: min(100%, 420px); display: block; padding: 26px; }
 .dialog { width: min(100%, 720px); max-height: min(90vh, 760px); overflow: auto; background: var(--surface); border-radius: 22px; box-shadow: 0 40px 80px -30px rgba(0,0,0,.5); display: grid; grid-template-columns: 1fr 1.1fr; }
 .dialog .hero { background: radial-gradient(circle at 50% 55%, var(--plate) 0 60%, var(--bg) 61%); display: grid; place-items: center; padding: 30px; min-height: 300px; }
 .dialog .hero img { max-height: 300px; width: auto; filter: drop-shadow(0 18px 16px var(--shadow)); }
@@ -186,12 +187,46 @@ legend { font: 600 .68rem var(--sans); letter-spacing: .2em; text-transform: upp
 .done h2 { font: 400 clamp(2rem, 4vw, 2.8rem) var(--serif); text-transform: uppercase; margin: 4px 0; }
 .done .lead { font: italic 500 1.3rem var(--script); color: var(--ink-soft); margin: 0 0 20px; }
 .receipt { text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: 18px; padding: 6px 18px 12px; }
-.games { margin-top: 34px; text-align: left; }
-.games h2 { font: 400 1.8rem var(--serif); text-transform: uppercase; margin: 0; }
-.games p { margin: 2px 0 14px; font: italic 500 1.15rem var(--script); color: var(--ink-soft); }
-.shelf { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
-@media (max-width: 640px) { .shelf { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-.slot { aspect-ratio: 3 / 4; max-width: 100%; border-radius: 14px; border: 2px dashed var(--line); display: grid; place-items: center; text-align: center; padding: 10px; font: 600 .7rem var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); }
+.done.compact { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; align-items: center; text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: 18px; padding: 16px 18px; max-width: none; }
+.done.compact .tick { width: 54px; height: 54px; margin: 0; font-size: 1.6rem; grid-row: span 2; }
+.done.compact h2 { font-size: clamp(1.4rem, 3vw, 1.8rem); margin: 0; }
+.done.compact .lead { margin: 0; font-size: 1.1rem; grid-column: 2; }
+.done.compact details { grid-column: 1 / -1; margin-top: 8px; }
+.done.compact summary { cursor: pointer; font: 600 .82rem var(--sans); letter-spacing: .08em; color: var(--ink-soft); padding: 6px 0; }
+.games { margin-top: 22px; text-align: left; }
+.games-head { display: flex; align-items: end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.games h2 { font: 400 clamp(1.7rem, 3.4vw, 2.3rem)/1.05 var(--serif); text-transform: uppercase; margin: 0; }
+.games .sub2 { margin: 4px 0 0; font: italic 500 1.15rem var(--script); color: var(--ink-soft); }
+.live { display: inline-flex; align-items: center; gap: 7px; font: 600 .7rem var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft); }
+.live i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 rgba(63,125,78,.5); animation: pulse 2s infinite; }
+.live.off i { background: #c0563f; animation: none; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(63,125,78,0); } 100% { box-shadow: 0 0 0 0 rgba(63,125,78,0); } }
+.mygame { display: flex; align-items: center; gap: 14px; background: var(--accent); color: var(--accent-ink); border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; }
+.mygame .box { width: 52px; height: 52px; border-radius: 12px; flex: 0 0 auto; display: grid; place-items: center; }
+.mygame .box svg { width: 34px; height: 34px; }
+.mygame b { display: block; font: 400 1.15rem var(--serif); text-transform: uppercase; }
+.mygame span { font-size: .9rem; opacity: .85; }
+.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.game { display: flex; flex-direction: column; text-align: left; border: 1.5px solid var(--line); background: var(--surface); border-radius: 16px; padding: 0; overflow: hidden; cursor: pointer; transition: transform .2s, box-shadow .2s; }
+.game:hover:not([disabled]) { transform: translateY(-3px); box-shadow: 0 14px 26px -16px var(--shadow); }
+.game[disabled] { cursor: not-allowed; opacity: .5; }
+.game .box { aspect-ratio: 4 / 3; display: grid; place-items: center; position: relative; }
+.game .box svg { width: 46%; height: auto; }
+.game .box::after { content: ""; position: absolute; inset: 8px; border: 1.5px solid rgba(255,255,255,.45); border-radius: 10px; }
+.game .gi { padding: 10px 12px 12px; }
+.game .gn { font: 400 1rem/1.15 var(--serif); text-transform: uppercase; }
+.game .gm { font-size: .78rem; color: var(--ink-soft); margin-top: 2px; }
+.game .ask { margin-top: 8px; font: 600 .74rem var(--sans); letter-spacing: .08em; color: var(--accent); }
+.away { margin-top: 12px; font-size: .85rem; color: var(--ink-soft); }
+.gconfirm { text-align: center; padding: 6px 4px 2px; }
+.gconfirm .box { width: 120px; height: 90px; border-radius: 14px; margin: 0 auto 14px; display: grid; place-items: center; }
+.gconfirm .box svg { width: 56px; }
+.gconfirm h3 { font: 400 1.6rem var(--serif); text-transform: uppercase; margin: 0 0 4px; }
+.gconfirm p { margin: 0 0 18px; color: var(--ink-soft); }
+.gconfirm .row { display: flex; gap: 10px; }
+.gconfirm .row button { flex: 1; }
+.pickup-note { background: var(--plate); border-radius: 12px; padding: 10px 12px; font-size: .85rem; margin: 0 0 4px; }
+.games-btn { border: 0; background: rgba(255,255,255,.88); color: #4c2350; border-radius: 999px; padding: 8px 14px; font: 600 .78rem var(--sans); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
 .again { margin-top: 26px; border: 1.5px solid var(--line); background: transparent; border-radius: 14px; padding: 13px 20px; cursor: pointer; font-weight: 500; }
 
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
@@ -203,6 +238,7 @@ legend { font: 600 .68rem var(--sans); letter-spacing: .2em; text-transform: upp
     <a href="https://rehan-saleh.github.io/poffies/" aria-label="Poffies website"><img class="logo" src="https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/7cc4d0bbe94bf8bdaeb9cad622a82997.png" alt="Poffies"></a>
     <span class="title">Menu</span>
     <span class="spacer"></span>
+    <button class="games-btn" type="button" id="gamesBtn" hidden>Board games</button>
     <span class="where" id="where" hidden><span class="dot"></span><span id="whereTxt"></span></span>
     <a class="site-link" href="https://rehan-saleh.github.io/poffies/">Our website</a>
   </div>
@@ -228,6 +264,7 @@ legend { font: 600 .68rem var(--sans); letter-spacing: .2em; text-transform: upp
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="layer"></div>
 
+<script src="live.js"></script>
 <script>
 
 /* ---------- Menu data, copied from the Poffies Canva menu (Oct 2026) ---------- */
@@ -301,15 +338,20 @@ const mono = n => n.replace(/[^A-Za-z]/g, '').charAt(0);
 const pic = it => PHOTOS[it.id] ? `<img src="${PHOTOS[it.id]}" alt="" loading="lazy">` : `<span class="mono">${mono(it.short)}</span>`;
 const isDesk = () => matchMedia('(min-width: 1181px)').matches;
 
-/* ---------- Where is the guest? From the QR link (#table4), otherwise chosen at checkout ---------- */
-let WHERE = null; // { type: 'table', n } or { type: 'takeaway', name }
+/* ---------- Where is the guest? ----------
+   A table only comes from the QR code on that table (#table4). Anyone else, e.g. ordering from home
+   through the website, is a pickup order: no table numbers and no board games. */
+let TABLE = null;
 const tm = (location.hash || '').match(/table(\d{1,2})/i);
-if (tm && +tm[1] >= 1 && +tm[1] <= 11) WHERE = { type: 'table', n: +tm[1] };
+if (tm && +tm[1] >= 1 && +tm[1] <= 11) TABLE = +tm[1];
+const AT_TABLE = TABLE !== null;
+const ORDERED_KEY = 'poffies-ordered-t' + TABLE;
+let hasOrdered = false;
+try { hasOrdered = AT_TABLE && sessionStorage.getItem(ORDERED_KEY) === '1'; } catch (e) {}
 function paintWhere() {
-  const el = document.getElementById('where');
-  if (!WHERE) { el.hidden = true; return; }
-  el.hidden = false;
-  document.getElementById('whereTxt').textContent = WHERE.type === 'table' ? 'Table ' + WHERE.n : 'Takeaway';
+  document.getElementById('where').hidden = false;
+  document.getElementById('whereTxt').textContent = AT_TABLE ? 'Table ' + TABLE : 'Pickup order';
+  document.getElementById('gamesBtn').hidden = !(AT_TABLE && hasOrdered);
 }
 paintWhere();
 
@@ -377,20 +419,18 @@ function setActive(id) {
 function orderHTML() {
   if (!cart.length) return `<div class="order"><h3>Your order</h3>
     <div class="none"><div class="cup">P</div>Nothing here yet.<br>Tap <b>+</b> on anything you fancy.</div></div>`;
-  const needWhere = !WHERE;
   return `<div class="order">
     <h3>Your order</h3>
-    <p class="sub">${WHERE ? (WHERE.type === 'table' ? 'For table ' + WHERE.n : 'Takeaway') : 'Tell us where to bring it below'}</p>
+    <p class="sub">${AT_TABLE ? 'For table ' + TABLE : 'Pickup at the counter'}</p>
     ${cart.map((l, i) => `<div class="line">
       <span class="n">${esc(ITEMS[l.id].n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
       <span class="x">${esc([l.size, ...l.extras].filter(Boolean).join(' · ') || aed(l.unit) + ' each')}</span>
       <span class="step"><button type="button" data-dec="${i}" aria-label="One less">−</button><output>${l.qty}</output><button type="button" data-inc="${i}" aria-label="One more">+</button></span>
     </div>`).join('')}
     <div class="totals"><span>Total</span><span>${aed(total())}</span></div>
-    <p class="note">Prices as on the menu. You pay at the counter.</p>
-    ${needWhere ? `<label class="field"><span>Where are you?</span>
-      <select id="whereSel"><option value="">Choose one</option>${Array.from({ length: 11 }, (_, k) => `<option value="t${k + 1}">Table ${k + 1}</option>`).join('')}<option value="take">Takeaway, I'll collect at the counter</option></select></label>
-      <label class="field" id="nameField" hidden><span>Name for your order</span><input id="nameIn" type="text" maxlength="30" autocomplete="given-name" placeholder="So we can call you"></label>` : ''}
+    ${AT_TABLE ? `<p class="note">Prices as on the menu. You pay at the counter.</p>`
+      : `<p class="pickup-note">Order now and collect it at the counter at Orchid Residence. You pay when you collect. Sitting in the café? Scan the QR code on your table instead.</p>
+      <label class="field"><span>Name for your order</span><input id="nameIn" type="text" maxlength="30" autocomplete="given-name" placeholder="So we can call you"></label>`}
     <label class="field"><span>Note for the kitchen · optional</span><textarea id="noteIn" rows="2" maxlength="140" placeholder="Less sugar, no ice, nut allergy…"></textarea></label>
     <button class="place" type="button" id="placeBtn"><span>Place order</span><span>${aed(total())}</span></button>
   </div>`;
@@ -399,26 +439,21 @@ function bindOrder(root) {
   root.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => { const l = cart[+b.dataset.inc]; l.qty++; changed(l.id); });
   root.querySelectorAll('[data-dec]').forEach(b => b.onclick = () => { const i = +b.dataset.dec, l = cart[i]; l.qty--; if (l.qty <= 0) cart.splice(i, 1); changed(l.id); });
   const btn = root.querySelector('#placeBtn'); if (!btn) return;
-  const sel = root.querySelector('#whereSel'), nameF = root.querySelector('#nameField'), nameIn = root.querySelector('#nameIn');
-  const gate = () => {
-    if (!sel) { btn.disabled = false; return; }
-    nameF.hidden = sel.value !== 'take';
-    btn.disabled = !sel.value || (sel.value === 'take' && !nameIn.value.trim());
-  };
-  if (sel) { sel.onchange = gate; nameIn.oninput = gate; }
+  const nameIn = root.querySelector('#nameIn');
+  const gate = () => { btn.disabled = !AT_TABLE && !nameIn.value.trim(); };
+  if (nameIn) nameIn.oninput = gate;
   gate();
-  btn.onclick = () => {
-    if (sel) WHERE = sel.value === 'take' ? { type: 'takeaway', name: nameIn.value.trim() } : { type: 'table', n: +sel.value.slice(1) };
-    place(root.querySelector('#noteIn').value.trim());
-  };
+  btn.onclick = () => place(root.querySelector('#noteIn').value.trim(), nameIn ? nameIn.value.trim() : '', btn);
 }
 function paintOrder() {
   const panel = document.getElementById('panel');
   const keepNote = document.getElementById('noteIn') ? document.getElementById('noteIn').value : '';
+  const keepName = document.getElementById('nameIn') ? document.getElementById('nameIn').value : '';
   panel.innerHTML = orderHTML(); bindOrder(panel);
   const drawer = document.querySelector('.drawer');
   if (drawer) { if (!cart.length) closeLayer(); else { drawer.innerHTML = `<button class="x-close" type="button" data-close aria-label="Close">×</button>` + orderHTML(); bindOrder(drawer); } }
   const n = document.getElementById('noteIn'); if (n && keepNote) n.value = keepNote;
+  const nm = document.getElementById('nameIn'); if (nm && keepName) { nm.value = keepName; nm.dispatchEvent(new Event('input')); }
   document.getElementById('bar').hidden = !cart.length || isDesk();
   document.body.classList.toggle('has-bar', cart.length > 0);
   document.getElementById('barCount').textContent = count();
@@ -432,7 +467,7 @@ function openLayer(html, cls) {
   lastFocus = document.activeElement;
   layer.innerHTML = cls === 'drawer'
     ? `<div class="scrim" data-scrim></div><div class="drawer" role="dialog" aria-modal="true" aria-label="Your order">${html}</div>`
-    : `<div class="scrim" data-scrim><div class="dialog" role="dialog" aria-modal="true" style="position:relative">${html}</div></div>`;
+    : `<div class="scrim" data-scrim><div class="dialog ${cls || ''}" role="dialog" aria-modal="true" style="position:relative">${html}</div></div>`;
   document.body.style.overflow = 'hidden';
   const f = layer.querySelector('button, input, select'); if (f) f.focus({ preventScroll: true });
 }
@@ -479,26 +514,91 @@ function orderDrawer() { openLayer(`<button class="x-close" type="button" data-c
 let tt;
 function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 1800); }
 
-/* ---------- Place order ---------- */
-function place(note) {
-  const lines = cart.slice(), sum = total(), ref = String(Math.floor(100 + Math.random() * 900));
-  cart = []; closeLayer(); paintWhere();
-  const table = WHERE.type === 'table';
+/* ---------- Place order: sent to the staff screen ---------- */
+let lastOrder = null;
+async function place(note, name, btn) {
+  const lines = cart.map(l => ({ n: ITEMS[l.id].n, qty: l.qty, unit: l.unit, opts: [l.size, ...l.extras].filter(Boolean).join(' · ') }));
+  const sum = total(), ref = String(Math.floor(100 + Math.random() * 900));
+  const order = { id: ref + '-' + Date.now().toString(36), ref, table: TABLE, name: AT_TABLE ? '' : name, lines, total: sum, note };
+  btn.disabled = true; btn.firstElementChild.textContent = 'Sending…';
+  try { await PoffiesLive.order(order); }
+  catch (e) { btn.disabled = false; btn.firstElementChild.textContent = 'Place order'; toast(AT_TABLE ? "Couldn't send your order. Try again, or tell a waiter." : "Couldn't send your order. Please try again."); return; }
+  cart = []; closeLayer(); lastOrder = order;
+  if (AT_TABLE) { hasOrdered = true; try { sessionStorage.setItem(ORDERED_KEY, '1'); } catch (e) {} }
+  paintWhere(); paintOrder();
   document.getElementById('tools').hidden = true;
+  if (AT_TABLE) showGames(order); else showPickupDone(order);
+}
+const receiptHTML = o => `${o.lines.map(l => `<div class="line"><span class="n">${l.qty} × ${esc(l.n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
+  <span class="x">${esc(l.opts || ' ')}</span></div>`).join('')}${o.note ? `<p class="note" style="margin-top:10px">Note: ${esc(o.note)}</p>` : ''}
+  <div class="totals"><span>Total</span><span>${aed(o.total)}</span></div>`;
+function backToMenu() { document.getElementById('tools').hidden = false; renderMenu(''); window.scrollTo(0, 0); }
+
+function showPickupDone(o) {
   document.getElementById('menu').innerHTML = `<div class="done">
     <div class="tick">✓</div>
-    <div class="ref">Order ${ref} · ${table ? 'Table ' + WHERE.n : 'Takeaway for ' + esc(WHERE.name)}</div>
+    <div class="ref">Order ${o.ref} · Pickup for ${esc(o.name)}</div>
     <h2>Order received</h2>
-    <p class="lead">${table ? "Sit back, we're making it now. Pay at the counter when you're ready." : "We'll call your name at the counter when it's ready. Pay when you collect."}</p>
-    <div class="receipt">${lines.map(l => `<div class="line"><span class="n">${l.qty} × ${esc(ITEMS[l.id].n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
-      <span class="x">${esc([l.size, ...l.extras].filter(Boolean).join(' · ') || ' ')}</span></div>`).join('')}
-      ${note ? `<p class="note" style="margin-top:10px">Note: ${esc(note)}</p>` : ''}
-      <div class="totals"><span>Total</span><span>${aed(sum)}</span></div></div>
-    ${table ? `<section class="games"><h2>Play while you wait</h2><p>Pick a board game from our shelf and we'll bring it to your table.</p>
-      <div class="shelf">${Array.from({ length: 6 }, () => '<div class="slot">Game coming soon</div>').join('')}</div></section>` : ''}
-    <button class="again" type="button" id="again">Back to the menu</button></div>`;
-  document.getElementById('again').onclick = () => { document.getElementById('tools').hidden = false; renderMenu(''); window.scrollTo(0, 0); };
-  paintOrder(); window.scrollTo(0, 0);
+    <p class="lead">We'll call your name at the counter when it's ready. You pay when you collect.</p>
+    <div class="receipt">${receiptHTML(o)}</div>
+    <button class="again" type="button" onclick="backToMenu()">Back to the menu</button></div>`;
+  window.scrollTo(0, 0);
+}
+
+/* Games come first after a table order: the guest sees them without scrolling. */
+let gamesOpen = false, pendingGame = null;
+function showGames(o) {
+  gamesOpen = true;
+  document.getElementById('tools').hidden = true;
+  document.getElementById('menu').innerHTML = `
+    ${o ? `<div class="done compact">
+      <div class="tick">✓</div>
+      <h2>Order ${o.ref} received</h2>
+      <p class="lead">Table ${TABLE} · we're making it now. Pay at the counter when you're ready.</p>
+      <details><summary>See your order · ${o.lines.reduce((a, l) => a + l.qty, 0)} items · ${aed(o.total)}</summary><div class="receipt" style="margin-top:8px">${receiptHTML(o)}</div></details>
+    </div>` : ''}
+    <section class="games" id="gamesBox"></section>
+    <button class="again" type="button" onclick="gamesOpen=false;backToMenu()">Back to the menu</button>`;
+  paintGames(); window.scrollTo(0, 0);
+}
+function paintGames() {
+  const box = document.getElementById('gamesBox'); if (!gamesOpen || !box) return;
+  const L = PoffiesLive, st = L.state, mine = L.tableGame(TABLE);
+  const free = L.GAMES.filter(g => st.games[g.id].status === 'shelf');
+  const out = L.GAMES.length - free.length - (mine ? 1 : 0);
+  let banner = '';
+  if (mine) {
+    const g = L.gameById(mine.id);
+    banner = `<div class="mygame"><div class="box" style="background:${g.c}">${L.art(g)}</div><div><b>${esc(g.n)}</b>
+      <span>${mine.status === 'requested' ? 'On its way to your table. A waiter has been told.' : "Enjoy! We'll collect it when your food arrives."}</span></div></div>`;
+  }
+  box.innerHTML = `<div class="games-head"><div><h2>Play while you wait</h2>
+      <p class="sub2">${mine ? 'One game per table at a time. Want another? Ask us to swap.' : "Pick a board game and we'll bring it to your table. It's free."}</p></div>
+      <span class="live ${L.connected ? '' : 'off'}"><i></i>${L.connected ? 'Live shelf' : 'Reconnecting'}</span></div>
+    ${banner}
+    ${free.length ? `<div class="shelf">${free.map(g => `<button class="game" type="button" data-game="${g.id}" ${mine ? 'disabled' : ''}>
+      <div class="box" style="background:${g.c}">${L.art(g)}</div>
+      <div class="gi"><div class="gn">${esc(g.n)}</div><div class="gm">${esc(g.p)} · ${esc(g.m)}</div>${mine ? '' : '<div class="ask">Bring to my table →</div>'}</div></button>`).join('')}</div>`
+      : `<p class="away">Every game is out at a table right now. Check back in a few minutes.</p>`}
+    ${out > 0 ? `<p class="away">${out} more ${out === 1 ? 'game is' : 'games are'} out at other tables and will show here once they're back on the shelf.</p>` : ''}`;
+  // a request we sent: did we get it, or did someone beat us to it?
+  if (pendingGame) {
+    const g = st.games[pendingGame];
+    if (g.table === TABLE) { pendingGame = null; }
+    else if (g.status !== 'shelf') { toast('Someone just took that one. Pick another.'); pendingGame = null; }
+  }
+}
+function askGame(id) {
+  const g = PoffiesLive.gameById(id);
+  openLayer(`<div class="gconfirm"><div class="box" style="background:${g.c}">${PoffiesLive.art(g)}</div>
+    <h3>${esc(g.n)}</h3><p>${esc(g.p)} · ${esc(g.m)}<br>We'll bring it to table ${TABLE}.</p>
+    <div class="row"><button class="again" style="margin:0" type="button" data-close>Not now</button><button class="addbtn" type="button" id="bring" style="justify-content:center">Yes, bring it</button></div></div>`, 'small');
+  document.getElementById('bring').onclick = async e => {
+    e.target.disabled = true; e.target.textContent = 'Telling the waiter…';
+    pendingGame = id;
+    try { await PoffiesLive.requestGame(id, TABLE, lastOrder ? lastOrder.ref : ''); closeLayer(); toast(`${g.n} is on its way`); }
+    catch (err) { pendingGame = null; e.target.disabled = false; e.target.textContent = 'Yes, bring it'; toast("Couldn't reach the staff. Please ask a waiter."); }
+  };
 }
 
 /* ---------- Events ---------- */
@@ -510,6 +610,7 @@ document.addEventListener('click', e => {
     else { addLine(it.id, null, [], 1, it.p); toast(`Added ${it.n}`); }
     return;
   }
+  const gm = e.target.closest('[data-game]'); if (gm) return askGame(gm.dataset.game);
   const open = e.target.closest('[data-open]'); if (open) return itemDialog(open.dataset.open);
   const go = e.target.closest('[data-go]');
   if (go) {
@@ -523,7 +624,9 @@ q.addEventListener('input', () => { qc.hidden = !q.value; renderMenu(q.value); }
 qc.onclick = () => { q.value = ''; qc.hidden = true; renderMenu(''); q.focus(); };
 addEventListener('resize', () => { if (isDesk() && document.querySelector('.drawer')) closeLayer(); paintOrder(); });
 
+document.getElementById('gamesBtn').onclick = () => showGames(null);
 renderNav(); renderMenu(''); paintOrder();
+if (AT_TABLE) { PoffiesLive.on(paintGames); PoffiesLive.connect(); }
 </script>
 </body>
 </html>

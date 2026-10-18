@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Poffies Staff</title>
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#fff6f2">
+<link rel="icon" href="https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/7cc4d0bbe94bf8bdaeb9cad622a82997.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Jost:wght@400;500;600&display=swap">
+<style>
+/* Layout: velvet band, then "Do this now" (game requests + collect reminders) beside "Orders"; the full shelf below. One tap per job. */
+:root {
+  --bg: #fff6f2; --surface: #ffffff; --plate: #f8e6ea; --ink: #4c2350; --ink-soft: #7b5580; --line: #efdbe1;
+  --accent: #4c2350; --accent-ink: #fff6f2; --gold: #c9a04c; --velvet: #eab3be; --velvet-dot: #9c4f63; --velvet-seam: rgba(150, 60, 85, .22);
+  --ok: #3f7d4e; --warn: #c9822e; --shadow: rgba(76, 35, 80, .16);
+  --serif: "Gilda Display", Georgia, serif; --sans: "Jost", "Segoe UI", system-ui, sans-serif;
+  --gl: max(16px, env(safe-area-inset-left, 0px)); --gr: max(16px, env(safe-area-inset-right, 0px));
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 400 15px/1.45 var(--sans); }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; border-radius: 8px; }
+[hidden] { display: none !important; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--velvet); }
+
+.band { background-color: var(--velvet); border-bottom: 5px solid var(--gold);
+  background-image: radial-gradient(circle, var(--velvet-dot) 0 2.5px, transparent 4px), radial-gradient(circle, var(--velvet-dot) 0 2.5px, transparent 4px),
+    repeating-linear-gradient(45deg, transparent 0 27.3px, var(--velvet-seam) 27.3px 28.3px), repeating-linear-gradient(-45deg, transparent 0 27.3px, var(--velvet-seam) 27.3px 28.3px);
+  background-size: 40px 40px, 40px 40px, auto, auto; background-position: 0 0, 20px 20px, 0 0, 0 0;
+  padding: calc(12px + env(safe-area-inset-top, 0px)) var(--gr) 12px var(--gl); position: sticky; top: 0; z-index: 20; }
+.band-in { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.band img { width: 130px; height: 40px; object-fit: cover; }
+.pill { background: rgba(255,255,255,.88); border: 0; border-radius: 999px; padding: 8px 14px; font: 600 .76rem var(--sans); letter-spacing: .1em; text-transform: uppercase; color: var(--ink); }
+.pill.dark { background: var(--accent); color: var(--accent-ink); }
+.spacer { flex: 1; }
+.live { display: inline-flex; align-items: center; gap: 7px; }
+.live i { width: 9px; height: 9px; border-radius: 50%; background: var(--ok); }
+.live.off i { background: #c0563f; }
+
+.wrap { max-width: 1400px; margin: 0 auto; padding: 18px var(--gr) 40px var(--gl); }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+@media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
+h2 { font: 400 1.5rem var(--serif); text-transform: uppercase; margin: 0 0 10px; display: flex; align-items: center; gap: 10px; }
+h2 .n { font: 600 .8rem var(--sans); background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 2px 10px; }
+.empty { border: 2px dashed var(--line); border-radius: 16px; padding: 22px; text-align: center; color: var(--ink-soft); }
+
+.job { display: flex; align-items: center; gap: 14px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 18px; padding: 14px; margin-bottom: 10px; box-shadow: 0 10px 24px -20px var(--shadow); }
+.job.new { animation: flash 1.2s ease 2; }
+@keyframes flash { 50% { background: #fff1d6; border-color: var(--gold); } }
+.job .box { width: 60px; height: 60px; border-radius: 14px; flex: 0 0 auto; display: grid; place-items: center; }
+.job .box svg { width: 38px; height: 38px; }
+.job .what { flex: 1; min-width: 0; }
+.job .what b { display: block; font: 400 1.2rem/1.2 var(--serif); text-transform: uppercase; }
+.job .what span { color: var(--ink-soft); font-size: .88rem; }
+.tag { display: inline-block; font: 600 .66rem var(--sans); letter-spacing: .14em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; margin-bottom: 4px; }
+.tag.req { background: #fde7c8; color: #8a5414; }
+.tag.col { background: #e3f0e6; color: #2f6a3e; }
+.act { border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-ink); padding: 14px 16px; font: 600 .92rem var(--sans); white-space: nowrap; min-height: 50px; }
+.act.alt { background: var(--plate); color: var(--ink); }
+@media (max-width: 520px) { .job { flex-wrap: wrap; } .job .act { width: 100%; } }
+
+.order { background: var(--surface); border: 1.5px solid var(--line); border-radius: 18px; padding: 14px 16px; margin-bottom: 10px; }
+.order.new { animation: flash 1.2s ease 2; }
+.order header { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.order header b { font: 400 1.25rem var(--serif); text-transform: uppercase; }
+.order header span { color: var(--ink-soft); font-size: .85rem; }
+.order ul { list-style: none; padding: 0; margin: 10px 0; display: grid; gap: 4px; }
+.order li { display: flex; justify-content: space-between; gap: 10px; }
+.order li small { display: block; color: var(--ink-soft); }
+.order .note { background: #fff1d6; border-radius: 10px; padding: 8px 10px; font-size: .88rem; margin-bottom: 10px; }
+.order footer { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.order footer strong { font-variant-numeric: tabular-nums; }
+.order.done { opacity: .55; }
+.done-toggle { border: 0; background: none; color: var(--ink-soft); font: 600 .8rem var(--sans); letter-spacing: .08em; text-transform: uppercase; padding: 6px 0; }
+
+.shelf-wrap { margin-top: 26px; }
+.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.slot { background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; text-align: left; padding: 0; }
+.slot .box { height: 64px; display: grid; place-items: center; }
+.slot .box svg { width: 34px; height: 34px; }
+.slot .si { padding: 8px 10px 10px; display: grid; gap: 4px; }
+.slot .sn { font: 400 .95rem/1.15 var(--serif); text-transform: uppercase; }
+.st { font: 600 .66rem var(--sans); letter-spacing: .12em; text-transform: uppercase; }
+.st.shelf { color: var(--ok); } .st.requested { color: var(--warn); } .st.table { color: var(--ink); }
+.slot .mini { border: 0; border-radius: 10px; background: var(--plate); padding: 7px 8px; font: 600 .74rem var(--sans); margin-top: 2px; }
+
+.scrim { position: fixed; inset: 0; z-index: 40; background: rgba(20, 8, 22, .45); display: grid; place-items: center; padding: 20px; }
+.sheet { background: var(--surface); border-radius: 22px; width: min(100%, 480px); padding: 24px; max-height: 90vh; overflow: auto; }
+.sheet h3 { font: 400 1.5rem var(--serif); text-transform: uppercase; margin: 0 0 10px; }
+.sheet ol { padding-left: 20px; display: grid; gap: 8px; }
+.code { display: flex; gap: 8px; align-items: center; background: var(--plate); border-radius: 12px; padding: 10px 12px; font: 600 .95rem ui-monospace, Menlo, monospace; word-break: break-all; }
+.code button { border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink); padding: 8px 12px; font: 600 .78rem var(--sans); flex: 0 0 auto; }
+.toast { position: fixed; z-index: 50; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 160%); background: var(--accent); color: var(--accent-ink); padding: 12px 18px; border-radius: 999px; transition: transform .3s; }
+.toast.show { transform: translate(-50%, 0); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="band-in">
+    <img src="https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/7cc4d0bbe94bf8bdaeb9cad622a82997.png" alt="Poffies">
+    <span class="pill dark">Staff screen</span>
+    <span class="pill live off" id="live"><i></i><span id="liveTxt">Connecting</span></span>
+    <span class="spacer"></span>
+    <button class="pill" type="button" id="soundBtn">Turn sound on</button>
+    <button class="pill" type="button" id="phoneBtn">Alerts on my phone</button>
+    <button class="pill" type="button" id="resetBtn">Reset demo</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="cols">
+    <section><h2>Do this now <span class="n" id="jobCount">0</span></h2><div id="jobs"></div></section>
+    <section><h2>Orders <span class="n" id="orderCount">0</span></h2><div id="orders"></div></section>
+  </div>
+  <section class="shelf-wrap"><h2>Games shelf</h2><div class="shelf" id="shelf"></div></section>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="layer"></div>
+
+<script src="live.js"></script>
+<script>
+const L = PoffiesLive;
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const ago = ts => { const m = Math.max(0, Math.round((Date.now() - ts) / 60000)); return m < 1 ? 'just now' : m === 1 ? '1 min ago' : m + ' min ago'; };
+const box = g => `<div class="box" style="background:${g.c}">${L.art(g)}</div>`;
+let seen = null, showDone = false;
+
+/* ---------- Sound: browsers only allow it after a tap ---------- */
+let audio = null;
+document.getElementById('soundBtn').onclick = e => {
+  try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); audio.resume(); beep(); e.target.textContent = 'Sound is on'; e.target.classList.add('dark'); }
+  catch (err) { toast('This browser blocked sound.'); }
+};
+function beep() {
+  if (!audio) return;
+  [0, .18].forEach(d => { const o = audio.createOscillator(), g = audio.createGain(); o.frequency.value = 880; o.connect(g); g.connect(audio.destination);
+    g.gain.setValueAtTime(.0001, audio.currentTime + d); g.gain.exponentialRampToValueAtTime(.25, audio.currentTime + d + .02); g.gain.exponentialRampToValueAtTime(.0001, audio.currentTime + d + .16);
+    o.start(audio.currentTime + d); o.stop(audio.currentTime + d + .18); });
+}
+
+/* ---------- Render ---------- */
+function render(st) {
+  document.getElementById('live').classList.toggle('off', !L.connected);
+  document.getElementById('liveTxt').textContent = L.connected ? 'Live' : 'Reconnecting';
+
+  // what is new since last render, for flash + sound
+  const keys = new Set();
+  const jobs = [];
+  for (const g of L.GAMES) {
+    const s = st.games[g.id];
+    if (s.status === 'requested') jobs.push({ key: 'req-' + g.id + s.since, ts: s.since, html: `<div class="job" data-k="req-${g.id}${s.since}">${box(g)}
+      <div class="what"><span class="tag req">Bring a game</span><b>${esc(g.n)} to table ${s.table}</b><span>Asked ${ago(s.since)}</span></div>
+      <button class="act" type="button" data-given="${g.id}" data-table="${s.table}">Given to table ${s.table}</button></div>` });
+    if (s.status === 'table') {
+      const servedAfter = st.orders.some(o => o.table === s.table && st.served[o.id] && st.served[o.id] >= s.since - 60000);
+      if (servedAfter) jobs.push({ key: 'col-' + g.id + s.since, ts: s.since, html: `<div class="job" data-k="col-${g.id}${s.since}">${box(g)}
+        <div class="what"><span class="tag col">Food served</span><b>Collect ${esc(g.n)} from table ${s.table}</b><span>Put it back on the shelf</span></div>
+        <button class="act" type="button" data-back="${g.id}">Back on shelf</button></div>` });
+    }
+  }
+  jobs.sort((a, b) => a.ts - b.ts);
+  jobs.forEach(j => keys.add(j.key));
+  document.getElementById('jobs').innerHTML = jobs.length ? jobs.map(j => j.html).join('') : '<div class="empty">Nothing to do. New game requests show up here.</div>';
+  document.getElementById('jobCount').textContent = jobs.length;
+
+  const open = st.orders.filter(o => !st.served[o.id]).sort((a, b) => a.ts - b.ts);
+  const done = st.orders.filter(o => st.served[o.id]).sort((a, b) => b.ts - a.ts).slice(0, 10);
+  open.forEach(o => keys.add('ord-' + o.id));
+  const orderHTML = (o, isDone) => `<article class="order ${isDone ? 'done' : ''}" data-k="ord-${esc(o.id)}">
+    <header><b>${o.table ? 'Table ' + o.table : 'Pickup · ' + esc(o.name)}</b><span>Order ${esc(o.ref)} · ${ago(o.ts)}</span></header>
+    <ul>${(o.lines || []).map(l => `<li><span>${l.qty} × ${esc(l.n)}${l.opts ? `<small>${esc(l.opts)}</small>` : ''}</span><span>${l.qty * l.unit} AED</span></li>`).join('')}</ul>
+    ${o.note ? `<div class="note">${esc(o.note)}</div>` : ''}
+    <footer><strong>${o.total} AED · pay at counter</strong>${isDone ? '<span>Done</span>' : `<button class="act" type="button" data-served="${esc(o.id)}">${o.table ? 'Served' : 'Collected'}</button>`}</footer></article>`;
+  document.getElementById('orders').innerHTML = (open.length ? open.map(o => orderHTML(o, false)).join('') : '<div class="empty">No open orders.</div>')
+    + (done.length ? `<button class="done-toggle" type="button" id="doneToggle">${showDone ? 'Hide' : 'Show'} finished orders (${done.length})</button>${showDone ? done.map(o => orderHTML(o, true)).join('') : ''}` : '');
+  document.getElementById('orderCount').textContent = open.length;
+
+  document.getElementById('shelf').innerHTML = L.GAMES.map(g => {
+    const s = st.games[g.id];
+    const label = s.status === 'shelf' ? 'On shelf' : s.status === 'requested' ? `Asked by table ${s.table}` : `At table ${s.table}`;
+    const btn = s.status === 'requested' ? `<button class="mini" type="button" data-given="${g.id}" data-table="${s.table}">Given</button>`
+      : s.status === 'table' ? `<button class="mini" type="button" data-back="${g.id}">Back on shelf</button>` : '';
+    return `<div class="slot">${box(g)}<div class="si"><span class="sn">${esc(g.n)}</span><span class="st ${s.status}">${label}</span>${btn}</div></div>`;
+  }).join('');
+
+  if (seen) {
+    const fresh = [...keys].filter(k => !seen.has(k));
+    fresh.forEach(k => { const el = document.querySelector(`[data-k="${CSS.escape(k)}"]`); if (el) el.classList.add('new'); });
+    if (fresh.some(k => k.startsWith('req-') || k.startsWith('ord-'))) beep();
+  }
+  seen = keys;
+}
+
+/* ---------- Actions: one tap each ---------- */
+async function run(p, ok) { try { await p; if (ok) toast(ok); } catch (e) { toast("Couldn't save. Check the internet and try again."); } }
+document.addEventListener('click', e => {
+  const t = e.target.closest('button'); if (!t) return;
+  if (t.dataset.given) return run(L.gameGiven(t.dataset.given, +t.dataset.table), `Marked as given to table ${t.dataset.table}`);
+  if (t.dataset.back) return run(L.gameBack(t.dataset.back), 'Back on the shelf. Guests can pick it again.');
+  if (t.dataset.served) return run(L.served(t.dataset.served), 'Order done');
+  if (t.id === 'doneToggle') { showDone = !showDone; render(L.state); }
+});
+
+/* Reset: two taps, so it can't happen by accident */
+let armed = 0;
+document.getElementById('resetBtn').onclick = e => {
+  if (Date.now() - armed < 4000) { armed = 0; e.target.textContent = 'Reset demo'; run(L.reset(), 'Demo cleared. Every game is back on the shelf.'); return; }
+  armed = Date.now(); e.target.textContent = 'Tap again to clear everything';
+  setTimeout(() => { if (armed) { armed = 0; e.target.textContent = 'Reset demo'; } }, 4000);
+};
+
+/* Phone alerts through the free ntfy app */
+document.getElementById('phoneBtn').onclick = () => {
+  document.getElementById('layer').innerHTML = `<div class="scrim" id="scrim"><div class="sheet" role="dialog" aria-modal="true">
+    <h3>Alerts on your phone</h3>
+    <p>Get a notification for every new order and game request, even with this screen closed.</p>
+    <ol>
+      <li>Install the free <b>ntfy</b> app from the App Store or Google Play.</li>
+      <li>Tap <b>+</b> to subscribe to a topic.</li>
+      <li>Enter this topic name exactly:</li>
+    </ol>
+    <div class="code"><span id="topic" style="flex:1">${L.ALERTS}</span><button type="button" id="copyTopic">Copy</button></div>
+    <p style="color:var(--ink-soft);font-size:.85rem;margin-top:12px">Leave the server as ntfy.sh. This is a demo channel: anyone who knows the topic name can read it, so don't share it.</p>
+    <button class="act" type="button" id="closeSheet" style="width:100%;margin-top:6px">Done</button></div></div>`;
+  document.getElementById('scrim').onclick = e => { if (e.target.id === 'scrim' || e.target.id === 'closeSheet') document.getElementById('layer').innerHTML = ''; };
+  document.getElementById('copyTopic').onclick = () => {
+    navigator.clipboard.writeText(L.ALERTS).then(() => toast('Topic copied'), () => { const r = document.createRange(); r.selectNodeContents(document.getElementById('topic')); getSelection().removeAllRanges(); getSelection().addRange(r); toast('Selected. Copy it from here.'); });
+  };
+};
+
+let tt;
+function toast(m) { const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 2200); }
+
+L.on(render); L.connect();
+setInterval(() => render(L.state), 30000);   // keep "x min ago" fresh
+</script>
+</body>
+</html>
