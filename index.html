@@ -39,11 +39,11 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   padding: calc(14px + env(safe-area-inset-top, 0px)) var(--gr) 14px var(--gl); }
 .band-in { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
 .band .logo { width: 150px; height: 46px; object-fit: cover; filter: drop-shadow(0 3px 0 rgba(255,255,255,.6)); }
-.band .title { font: 400 1.4rem var(--serif); text-transform: uppercase; letter-spacing: .04em; color: #fff; text-shadow: 0 2px 0 rgba(76,35,80,.45); }
+.band .title { font: 400 1.4rem var(--serif); text-transform: uppercase; letter-spacing: .04em; color: var(--ink); background: rgba(255,255,255,.75); padding: 2px 12px; border-radius: 999px; }
 .band .spacer { flex: 1; }
 .where { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.88); color: #4c2350; border-radius: 999px; padding: 8px 14px; font: 600 .78rem var(--sans); letter-spacing: .12em; text-transform: uppercase; }
 .where .dot { width: 8px; height: 8px; border-radius: 50%; background: #3f7d4e; }
-.site-link { color: #fff; font: 500 .82rem var(--sans); letter-spacing: .08em; text-transform: uppercase; text-decoration: none; text-shadow: 0 1px 0 rgba(76,35,80,.5); }
+.site-link { color: var(--ink); background: rgba(255,255,255,.75); padding: 8px 14px; border-radius: 999px; font: 600 .78rem var(--sans); letter-spacing: .1em; text-transform: uppercase; text-decoration: none; }
 .site-link:hover { text-decoration: underline; }
 @media (max-width: 640px) { .band .title, .site-link { display: none; } .band .logo { width: 128px; height: 40px; } }
 
