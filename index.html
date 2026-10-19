@@ -226,6 +226,16 @@ legend { font: 600 .68rem var(--sans); letter-spacing: .2em; text-transform: upp
 .gconfirm .row { display: flex; gap: 10px; }
 .gconfirm .row button { flex: 1; }
 .pickup-note { background: var(--plate); border-radius: 12px; padding: 10px 12px; font-size: .85rem; margin: 0 0 4px; }
+body.co-mode .rail, body.co-mode .panel { display: none !important; }
+body.co-mode .shell { grid-template-columns: minmax(0, 1fr); }
+.co-top { max-width: 980px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.steps3 { display: flex; align-items: center; gap: 8px; list-style: none; margin: 0; padding: 0; font: 600 .78rem var(--sans); color: var(--ink-soft); }
+.steps3 li { display: flex; align-items: center; gap: 6px; }
+.steps3 b { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--line); font-size: .75rem; }
+.steps3 li.ok b { background: var(--ok); border-color: var(--ok); color: #fff; }
+.steps3 li.now { color: var(--ink); } .steps3 li.now b { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.steps3 i { width: 18px; height: 1.5px; background: var(--line); }
+@media (max-width: 480px) { .steps3 span { display: none; } }
 .checkout { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 22px; align-items: start; }
 @media (max-width: 860px) { .checkout { grid-template-columns: 1fr; } }
 .co-back { border: 0; background: none; color: var(--ink-soft); font: 600 .8rem var(--sans); letter-spacing: .1em; text-transform: uppercase; padding: 4px 0 12px; cursor: pointer; }
@@ -620,7 +630,7 @@ async function place(info, btn) {
   btn.disabled = true; btn.firstElementChild.innerHTML = '<span class="spin" aria-hidden="true"></span>Sending…';
   try { await PoffiesLive.order(order); }
   catch (e) { placing = false; btn.disabled = false; btn.firstElementChild.textContent = label; toast(AT_TABLE ? "Couldn't send your order. Try again, or tell a waiter." : "Couldn't send your order. Check your internet and try again."); return; }
-  placing = false; cart = []; closeLayer(); lastOrder = order; inCheckout = false;
+  placing = false; cart = []; closeLayer(); lastOrder = order; inCheckout = false; coDraft = null; document.body.classList.remove('co-mode');
   if (AT_TABLE) { hasOrdered = true; try { sessionStorage.setItem(ORDERED_KEY, '1'); } catch (e) {} }
   paintWhere(); paintOrder();
   document.getElementById('tools').hidden = true;
@@ -629,11 +639,12 @@ async function place(info, btn) {
 const receiptHTML = o => `${o.lines.map(l => `<div class="line"><span class="n">${l.qty} × ${esc(l.n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
   <span class="x">${esc(l.opts || ' ')}</span></div>`).join('')}${o.note ? `<p class="note" style="margin-top:10px">Note: ${esc(o.note)}</p>` : ''}
   <div class="totals"><span>Total</span><span>${aed(o.total)}</span></div>`;
-function backToMenu() { document.getElementById('tools').hidden = false; renderMenu(''); window.scrollTo(0, 0); }
+function backToMenu() { document.body.classList.remove('co-mode'); document.getElementById('tools').hidden = false; renderMenu(''); window.scrollTo(0, 0); }
 
 function showHomeDone(o) {
   const d = o.mode === 'delivery';
   document.getElementById('menu').innerHTML = `<div class="done">
+    <ol class="steps3" aria-label="Progress" style="justify-content:center;margin-bottom:8px"><li class="ok"><b>✓</b><span>Your food</span></li><i></i><li class="ok"><b>✓</b><span>Your details</span></li><i></i><li class="ok"><b>✓</b><span>Done</span></li></ol>
     <div class="tick">✓</div>
     <div class="ref">Order ${o.ref} · ${d ? 'Delivery' : 'Self pickup'}</div>
     <h2>Order received</h2>
@@ -646,18 +657,22 @@ function showHomeDone(o) {
 }
 
 /* ---------- Checkout for home orders: delivery to an address, or self pickup ---------- */
-let inCheckout = false, coLoc = null;
+let inCheckout = false, coLoc = null, coDraft = null;   // coDraft: what the guest typed, kept while they go back to the menu
 const CO_KEY = 'poffies-checkout';
 function savedCheckout() { try { return JSON.parse(localStorage.getItem(CO_KEY) || '{}'); } catch (e) { return {}; } }
 function showCheckout() {
   if (!cart.length) return;
   inCheckout = true;
-  const sv = savedCheckout();
+  document.body.classList.add('co-mode');
+  const sv = Object.assign({}, savedCheckout(), coDraft || {});
   const mode = sv.mode === 'pickup' ? 'pickup' : 'delivery';
   document.getElementById('tools').hidden = true;
   document.getElementById('bar').hidden = true; document.body.classList.remove('has-bar');
   document.getElementById('menu').innerHTML = `
-    <button class="co-back" type="button" id="coBack">← Back to the menu</button>
+    <div class="co-top">
+      <button class="co-back" type="button" id="coBack" style="padding:0">← Edit order</button>
+      <ol class="steps3" aria-label="Progress"><li class="ok"><b>✓</b><span>Your food</span></li><i></i><li class="now"><b>2</b><span>Your details</span></li><i></i><li><b>3</b><span>Done</span></li></ol>
+    </div>
     <form class="checkout" id="coForm" novalidate>
       <div class="co-card">
         <h2>Checkout</h2>
@@ -681,7 +696,7 @@ function showCheckout() {
           <button class="locbtn" type="button" id="coLocBtn">Add my exact location (helps the driver)</button>
         </div>
         <div id="coPick" class="pickup-note" style="margin-top:12px">Collect at the counter at Orchid Residence, Dubai Science Park. We'll have it ready under your name.</div>
-        <label class="field"><span>Note for the kitchen · optional</span><textarea id="coKitchen" rows="2" maxlength="140" placeholder="Less sugar, no ice, nut allergy…"></textarea></label>
+        <label class="field"><span>Note for the kitchen · optional</span><textarea id="coKitchen" rows="2" maxlength="140" placeholder="Less sugar, no ice, nut allergy…">${esc(sv.kitchen || '')}</textarea></label>
       </div>
       <div class="co-card co-sum">
         <h2>Your order</h2>
@@ -701,7 +716,9 @@ function showCheckout() {
     document.getElementById('coPayNote').textContent = del ? 'We call you to confirm your order and delivery time before we send it.' : 'You pay at the counter when you collect.';
   };
   f.addEventListener('change', sync); sync();
-  const leave = () => { inCheckout = false; backToMenu(); paintOrder(); };
+  const grab = () => { const v = id => document.getElementById(id).value; coDraft = { mode: f.querySelector('input[name=mode]:checked').value, name: v('coName'), phone: v('coPhone'), area: v('coArea'), building: v('coBuilding'), flat: v('coFlat'), street: v('coStreet'), notes: v('coNotes'), kitchen: v('coKitchen') }; };
+  f.addEventListener('input', grab); f.addEventListener('change', grab);
+  const leave = () => { grab(); inCheckout = false; backToMenu(); paintOrder(); };
   document.getElementById('coBack').onclick = leave;
   document.getElementById('coEdit').onclick = leave;
   const lb = document.getElementById('coLocBtn');
