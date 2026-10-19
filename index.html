@@ -472,7 +472,7 @@ function orderHTML() {
     <p class="sub">${AT_TABLE ? 'For table ' + TABLE : 'Delivery or self pickup, you choose at checkout'}</p>
     ${cart.map((l, i) => `<div class="line">
       <button class="n edit" type="button" data-edit="${esc(l.key)}" aria-label="Change ${esc(ITEMS[l.id].n)}">${esc(ITEMS[l.id].n)}</button><span class="lp">${aed(l.qty * l.unit)}</span>
-      <span class="x">${esc(optsText(l) || aed(l.unit) + ' each')}${hasOptions(ITEMS[l.id]) ? ` · <button class="change" type="button" data-edit="${esc(l.key)}">Change</button>` : ''}</span>
+      <span class="x">${esc(optsText(l) || (hasOptions(ITEMS[l.id]) ? 'No extras' : aed(l.unit) + ' each'))}${hasOptions(ITEMS[l.id]) ? ` · <button class="change" type="button" data-edit="${esc(l.key)}">Change</button>` : ''}</span>
       <span class="step"><button type="button" class="bin" data-del="${i}" aria-label="Remove ${esc(ITEMS[l.id].n)}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button><button type="button" data-dec="${i}" aria-label="One less">−</button><output>${l.qty}</output><button type="button" data-inc="${i}" aria-label="One more">+</button></span>
     </div>`).join('')}
     <div class="totals"><span>Total</span><span>${aed(total())}</span></div>
