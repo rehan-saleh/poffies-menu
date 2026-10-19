@@ -245,6 +245,8 @@ legend { font: 600 .68rem var(--sans); letter-spacing: .2em; text-transform: upp
 .locbtn { margin-top: 10px; border: 1.5px dashed var(--line); background: transparent; border-radius: 12px; padding: 11px 12px; width: 100%; text-align: left; font: 500 .9rem var(--sans); cursor: pointer; }
 .locbtn.ok { border-style: solid; border-color: var(--ok); color: var(--ok); }
 .co-sum .line .step { display: none; }
+.spin { display: inline-block; width: 15px; height: 15px; border: 2.5px solid currentColor; border-right-color: transparent; border-radius: 50%; vertical-align: -3px; margin-right: 8px; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 .games-btn { border: 0; background: rgba(255,255,255,.88); color: #4c2350; border-radius: 999px; padding: 8px 14px; font: 600 .78rem var(--sans); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
 .again { margin-top: 26px; border: 1.5px solid var(--line); background: transparent; border-radius: 14px; padding: 13px 20px; cursor: pointer; font-weight: 500; }
 
@@ -283,7 +285,7 @@ legend { font: 600 .68rem var(--sans); letter-spacing: .2em; text-transform: upp
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="layer"></div>
 
-<script src="live.js?v=4"></script>
+<script src="live.js?v=5"></script>
 <script>
 
 /* ---------- Menu data, copied from the Poffies Canva menu (Oct 2026) ---------- */
@@ -539,15 +541,18 @@ function toast(msg) { const t = document.getElementById('toast'); t.textContent 
 
 /* ---------- Place order: sent to the staff screen ---------- */
 let lastOrder = null;
+let placing = false;
 async function place(info, btn) {
+  if (placing) return;          // a double tap must never send the order twice
+  placing = true;
   const lines = cart.map(l => ({ n: ITEMS[l.id].n, qty: l.qty, unit: l.unit, opts: [l.size, ...l.extras].filter(Boolean).join(' · ') }));
   const sum = total(), ref = String(Math.floor(100 + Math.random() * 900));
   const order = Object.assign({ id: ref + '-' + Date.now().toString(36), ref, table: AT_TABLE ? TABLE : null, lines, total: sum }, info);
   const label = btn.firstElementChild.textContent;
-  btn.disabled = true; btn.firstElementChild.textContent = 'Sending…';
+  btn.disabled = true; btn.firstElementChild.innerHTML = '<span class="spin" aria-hidden="true"></span>Sending…';
   try { await PoffiesLive.order(order); }
-  catch (e) { btn.disabled = false; btn.firstElementChild.textContent = label; toast(AT_TABLE ? "Couldn't send your order. Try again, or tell a waiter." : "Couldn't send your order. Check your internet and try again."); return; }
-  cart = []; closeLayer(); lastOrder = order; inCheckout = false;
+  catch (e) { placing = false; btn.disabled = false; btn.firstElementChild.textContent = label; toast(AT_TABLE ? "Couldn't send your order. Try again, or tell a waiter." : "Couldn't send your order. Check your internet and try again."); return; }
+  placing = false; cart = []; closeLayer(); lastOrder = order; inCheckout = false;
   if (AT_TABLE) { hasOrdered = true; try { sessionStorage.setItem(ORDERED_KEY, '1'); } catch (e) {} }
   paintWhere(); paintOrder();
   document.getElementById('tools').hidden = true;
@@ -710,7 +715,7 @@ function askGame(id) {
     <h3>${esc(g.n)}</h3><p>${esc(g.p)} · ${esc(g.m)}<br>We'll bring it to table ${TABLE}.</p>
     <div class="row"><button class="again" style="margin:0" type="button" data-close>Not now</button><button class="addbtn" type="button" id="bring" style="justify-content:center">Yes, bring it</button></div></div>`, 'small');
   document.getElementById('bring').onclick = async e => {
-    e.target.disabled = true; e.target.textContent = 'Telling the waiter…';
+    e.target.disabled = true; e.target.innerHTML = '<span class="spin" aria-hidden="true"></span>Telling the waiter…';
     pendingGame = id;
     try { await PoffiesLive.requestGame(id, TABLE, lastOrder ? lastOrder.ref : ''); closeLayer(); toast(`${g.n} is on its way`); }
     catch (err) { pendingGame = null; e.target.disabled = false; e.target.textContent = 'Yes, bring it'; toast("Couldn't reach the staff. Please ask a waiter."); }
@@ -722,7 +727,7 @@ document.addEventListener('click', e => {
   const quick = e.target.closest('[data-quick]');
   if (quick) {
     const it = ITEMS[quick.dataset.quick];
-    if (it.sizes) itemDialog(it.id); // size matters, so ask
+    if (it.sizes || it.extras) itemDialog(it.id); // there is something to choose, so ask first
     else { addLine(it.id, null, [], 1, it.p); toast(`Added ${it.n}`); }
     return;
   }

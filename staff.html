@@ -60,6 +60,9 @@ h2 .n { font: 600 .8rem var(--sans); background: var(--accent); color: var(--acc
 .tag.req { background: #fde7c8; color: #8a5414; }
 .tag.col { background: #e3f0e6; color: #2f6a3e; }
 .act { border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-ink); padding: 14px 16px; font: 600 .92rem var(--sans); white-space: nowrap; min-height: 50px; }
+.act[disabled], .mini[disabled] { opacity: .75; cursor: progress; }
+.spin { display: inline-block; width: 15px; height: 15px; border: 2.5px solid currentColor; border-right-color: transparent; border-radius: 50%; vertical-align: -3px; margin-right: 8px; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 .act.alt { background: var(--plate); color: var(--ink); }
 @media (max-width: 520px) { .job { flex-wrap: wrap; } .job .act { width: 100%; } }
 
@@ -125,13 +128,23 @@ h2 .n { font: 600 .8rem var(--sans); background: var(--accent); color: var(--acc
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <div id="layer"></div>
 
-<script src="live.js?v=4"></script>
+<script src="live.js?v=5"></script>
 <script>
 const L = PoffiesLive;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const ago = ts => { const m = Math.max(0, Math.round(((PoffiesLive.now ? PoffiesLive.now() : Date.now()) - ts) / 60000)); return m < 1 ? 'just now' : m === 1 ? '1 min ago' : m + ' min ago'; };
 const box = g => `<div class="box" style="background:${g.c}">${L.art(g)}</div>`;
 let seen = null, showDone = false;
+const pending = {};   // key -> time tapped; the button shows a spinner until the change comes back from the channel
+const busy = (key, label) => pending[key] ? `disabled><span class="spin" aria-hidden="true"></span>Saving…` : `>${label}`;
+function prune(st) {
+  for (const k in pending) {
+    const [kind, id] = k.split(':');
+    const g = st.games[id];
+    const done = kind === 'given' ? !(g && g.status === 'requested') : kind === 'back' ? (g && g.status === 'shelf') : kind === 'served' ? !!st.served[id] : true;
+    if (done || Date.now() - pending[k] > 20000) delete pending[k];
+  }
+}
 
 /* ---------- Sound: browsers only allow it after a tap ---------- */
 let audio = null;
@@ -148,6 +161,7 @@ function beep() {
 
 /* ---------- Render ---------- */
 function render(st) {
+  prune(st);
   document.getElementById('live').classList.toggle('off', !L.connected);
   document.getElementById('liveTxt').textContent = L.connected ? 'Live' : 'Reconnecting';
 
@@ -158,12 +172,12 @@ function render(st) {
     const s = st.games[g.id];
     if (s.status === 'requested') jobs.push({ key: 'req-' + g.id + s.since, ts: s.since, html: `<div class="job" data-k="req-${g.id}${s.since}">${box(g)}
       <div class="what"><span class="tag req">Bring a game</span><b>${esc(g.n)} to table ${s.table}</b><span>Asked ${ago(s.since)}</span></div>
-      <button class="act" type="button" data-given="${g.id}" data-table="${s.table}">Given to table ${s.table}</button></div>` });
+      <button class="act" type="button" data-given="${g.id}" data-table="${s.table}" ${busy('given:' + g.id, 'Given to table ' + s.table)}</button></div>` });
     if (s.status === 'table') {
       const servedAfter = st.orders.some(o => o.table === s.table && st.served[o.id] && st.served[o.id] >= s.since - 60000);
       if (servedAfter) jobs.push({ key: 'col-' + g.id + s.since, ts: s.since, html: `<div class="job" data-k="col-${g.id}${s.since}">${box(g)}
         <div class="what"><span class="tag col">Food served</span><b>Collect ${esc(g.n)} from table ${s.table}</b><span>Put it back on the shelf</span></div>
-        <button class="act" type="button" data-back="${g.id}">Back on shelf</button></div>` });
+        <button class="act" type="button" data-back="${g.id}" ${busy('back:' + g.id, 'Back on shelf')}</button></div>` });
     }
   }
   jobs.sort((a, b) => a.ts - b.ts);
@@ -179,7 +193,7 @@ function render(st) {
     ${!o.table ? `<div class="who">${o.phone ? `<span>Call <b>${esc(o.phone)}</b></span>` : ''}${o.mode === 'delivery' && o.address ? `<span>${esc([o.address.building, o.address.flat && 'Flat ' + o.address.flat, o.address.street, o.address.area].filter(Boolean).join(', '))}</span>${o.address.notes ? `<span class="dir">${esc(o.address.notes)}</span>` : ''}<a target="_blank" rel="noopener" href="${o.address.loc ? `https://www.google.com/maps?q=${o.address.loc.lat},${o.address.loc.lng}` : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([o.address.building, o.address.street, o.address.area, 'Dubai'].filter(Boolean).join(', '))}`}">Open in Maps${o.address.loc ? ' (exact pin)' : ''}</a>` : ''}</div>` : ''}
     <ul>${(o.lines || []).map(l => `<li><span>${l.qty} × ${esc(l.n)}${l.opts ? `<small>${esc(l.opts)}</small>` : ''}</span><span>${l.qty * l.unit} AED</span></li>`).join('')}</ul>
     ${o.note ? `<div class="note">${esc(o.note)}</div>` : ''}
-    <footer><strong>${o.total} AED${o.mode === 'delivery' ? '' : ' · pay at counter'}</strong>${isDone ? '<span>Done</span>' : `<button class="act" type="button" data-served="${esc(o.id)}">${o.table ? 'Served' : o.mode === 'delivery' ? 'Out for delivery' : 'Collected'}</button>`}</footer></article>`;
+    <footer><strong>${o.total} AED${o.mode === 'delivery' ? '' : ' · pay at counter'}</strong>${isDone ? '<span>Done</span>' : `<button class="act" type="button" data-served="${esc(o.id)}" ${busy('served:' + o.id, o.table ? 'Served' : o.mode === 'delivery' ? 'Out for delivery' : 'Collected')}</button>`}</footer></article>`;
   document.getElementById('orders').innerHTML = (open.length ? open.map(o => orderHTML(o, false)).join('') : '<div class="empty">No open orders.</div>')
     + (done.length ? `<button class="done-toggle" type="button" id="doneToggle">${showDone ? 'Hide' : 'Show'} finished orders (${done.length})</button>${showDone ? done.map(o => orderHTML(o, true)).join('') : ''}` : '');
   document.getElementById('orderCount').textContent = open.length;
@@ -187,8 +201,8 @@ function render(st) {
   document.getElementById('shelf').innerHTML = L.GAMES.map(g => {
     const s = st.games[g.id];
     const label = s.status === 'shelf' ? 'On shelf' : s.status === 'requested' ? `Asked by table ${s.table}` : `At table ${s.table}`;
-    const btn = s.status === 'requested' ? `<button class="mini" type="button" data-given="${g.id}" data-table="${s.table}">Given</button>`
-      : s.status === 'table' ? `<button class="mini" type="button" data-back="${g.id}">Back on shelf</button>` : '';
+    const btn = s.status === 'requested' ? `<button class="mini" type="button" data-given="${g.id}" data-table="${s.table}" ${busy('given:' + g.id, 'Given')}</button>`
+      : s.status === 'table' ? `<button class="mini" type="button" data-back="${g.id}" ${busy('back:' + g.id, 'Back on shelf')}</button>` : '';
     return `<div class="slot">${box(g)}<div class="si"><span class="sn">${esc(g.n)}</span><span class="st ${s.status}">${label}</span>${btn}</div></div>`;
   }).join('');
 
@@ -201,19 +215,24 @@ function render(st) {
 }
 
 /* ---------- Actions: one tap each ---------- */
-async function run(p, ok) { try { await p; if (ok) toast(ok); } catch (e) { toast("Couldn't save. Check the internet and try again."); } }
+async function run(key, fn, ok) {
+  if (pending[key]) return;
+  pending[key] = Date.now(); render(L.state);            // spinner straight away
+  try { await fn(); if (ok) toast(ok); }
+  catch (e) { delete pending[key]; render(L.state); toast("Couldn't save. Check the internet and try again."); }
+}
 document.addEventListener('click', e => {
-  const t = e.target.closest('button'); if (!t) return;
-  if (t.dataset.given) return run(L.gameGiven(t.dataset.given, +t.dataset.table), `Marked as given to table ${t.dataset.table}`);
-  if (t.dataset.back) return run(L.gameBack(t.dataset.back), 'Back on the shelf. Guests can pick it again.');
-  if (t.dataset.served) return run(L.served(t.dataset.served), 'Order done');
+  const t = e.target.closest('button'); if (!t || t.disabled) return;
+  if (t.dataset.given) return run('given:' + t.dataset.given, () => L.gameGiven(t.dataset.given, +t.dataset.table), `Given to table ${t.dataset.table}`);
+  if (t.dataset.back) return run('back:' + t.dataset.back, () => L.gameBack(t.dataset.back), 'Back on the shelf. Guests can pick it again.');
+  if (t.dataset.served) return run('served:' + t.dataset.served, () => L.served(t.dataset.served), 'Order done');
   if (t.id === 'doneToggle') { showDone = !showDone; render(L.state); }
 });
 
 /* Reset: two taps, so it can't happen by accident */
 let armed = 0;
 document.getElementById('resetBtn').onclick = e => {
-  if (Date.now() - armed < 4000) { armed = 0; e.target.textContent = 'Reset demo'; run(L.reset(), 'Demo cleared. Every game is back on the shelf.'); return; }
+  if (Date.now() - armed < 4000) { armed = 0; e.target.textContent = 'Reset demo'; L.reset().then(() => toast('Demo cleared. Every game is back on the shelf.'), () => toast("Couldn't reset. Check the internet.")); return; }
   armed = Date.now(); e.target.textContent = 'Tap again to clear everything';
   setTimeout(() => { if (armed) { armed = 0; e.target.textContent = 'Reset demo'; } }, 4000);
 };

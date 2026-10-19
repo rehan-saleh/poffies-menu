@@ -52,7 +52,7 @@
   function fresh() {
     const games = {};
     GAMES.forEach(g => games[g.id] = { status: 'shelf', table: null, since: 0 });
-    return { games, orders: [], served: {}, lastId: null };
+    return { games, orders: [], served: {}, lastId: null, seen: new Set() };
   }
   let state = fresh();
   const listeners = new Set();
@@ -60,8 +60,8 @@
   function apply(e, ts) {
     const G = state.games;
     switch (e.t) {
-      case 'reset': state = fresh(); return;
-      case 'order': state.orders.push(Object.assign({ ts }, e)); return;
+      case 'reset': { const keep = state.seen; state = fresh(); state.seen = keep; return; }
+      case 'order': if (!state.orders.some(o => o.id === e.id)) state.orders.push(Object.assign({ ts }, e)); return;   // an order counts once, however often it arrives
       case 'served': state.served[e.id] = ts; return;
       case 'game_req': {
         const g = G[e.game]; if (!g || g.status !== 'shelf') return;           // first request wins
@@ -75,6 +75,8 @@
   function ingest(line) {
     let m; try { m = JSON.parse(line); } catch { return false; }
     if (m.event && m.event !== 'message') return false;
+    if (m.id && state.seen.has(m.id)) return false;   // reconnects can resend messages: apply each one once
+    if (m.id) state.seen.add(m.id);
     let e; try { e = JSON.parse(m.message); } catch { return false; }
     apply(e, (m.time || Date.now() / 1000) * 1000);
     state.lastId = m.id || state.lastId;
@@ -85,7 +87,9 @@
   /* ---------- Connect: replay history, then stay live ---------- */
   let es = null, connected = false;
   let skew = 0; // this device's clock minus the server's, so 'x min ago' is right even on a wrong clock
-  async function connect() {
+  let connecting = null;
+  function connect() { if (!connecting) connecting = doConnect().finally(() => { connecting = null; }); return connecting; }
+  async function doConnect() {
     try {
       const txt = await fetch(`${HOST}/${EVENTS}/json?poll=1&since=12h`, { cache: 'no-store' }).then(r => r.text());
       state = fresh();
