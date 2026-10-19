@@ -1,0 +1,846 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Poffies Menu</title>
+<meta name="theme-color" content="#fff6f2">
+<link rel="icon" href="https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/7cc4d0bbe94bf8bdaeb9cad622a82997.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Gilda+Display&family=Cormorant+Garamond:ital,wght@1,500&family=Jost:wght@400;500;600&display=swap">
+<style>
+/* Layout: velvet band on top. Desktop = category rail | item grid | order panel. Tablet = chips + grid + order drawer. Phone = chips + list + bottom bar and sheets. */
+:root {
+  --bg: #fff6f2; --surface: #ffffff; --card: #ffffff; --plate: #f8e6ea; --ink: #4c2350; --ink-soft: #7b5580; --line: #efdbe1;
+  --accent: #4c2350; --accent-ink: #fff6f2; --gold: #c9a04c; --gold-soft: #e6cf96; --velvet: #eab3be; --velvet-dot: #9c4f63; --velvet-seam: rgba(150, 60, 85, .22);
+  --ok: #3f7d4e; --shadow: rgba(76, 35, 80, .16);
+  --display: "Bagel Fat One", "Arial Rounded MT Bold", system-ui, sans-serif;
+  --serif: "Gilda Display", Georgia, "Times New Roman", serif;
+  --script: "Cormorant Garamond", Georgia, serif;
+  --sans: "Jost", "Segoe UI", system-ui, sans-serif;
+  --gl: max(16px, env(safe-area-inset-left, 0px)); --gr: max(16px, env(safe-area-inset-right, 0px));
+  color-scheme: light;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: linear-gradient(var(--bg), #fdeef0 70%) fixed; color: var(--ink); font: 400 15px/1.5 var(--sans); }
+img { max-width: 100%; display: block; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; border-radius: 8px; }
+[hidden] { display: none !important; }
+
+/* ---------- Velvet band ---------- */
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 60; background: var(--velvet); }
+.band { position: relative; background-color: var(--velvet); border-bottom: 5px solid var(--gold);
+  background-image: radial-gradient(circle, var(--velvet-dot) 0 2.5px, transparent 4px), radial-gradient(circle, var(--velvet-dot) 0 2.5px, transparent 4px),
+    repeating-linear-gradient(45deg, transparent 0 27.3px, var(--velvet-seam) 27.3px 28.3px), repeating-linear-gradient(-45deg, transparent 0 27.3px, var(--velvet-seam) 27.3px 28.3px);
+  background-size: 40px 40px, 40px 40px, auto, auto; background-position: 0 0, 20px 20px, 0 0, 0 0;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) var(--gr) 14px var(--gl); }
+.band-in { max-width: 1440px; margin: 0 auto; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.band .logo { width: 150px; height: 46px; object-fit: cover; filter: drop-shadow(0 3px 0 rgba(255,255,255,.6)); }
+.band .title { font: 400 1.4rem var(--serif); text-transform: uppercase; letter-spacing: .04em; color: var(--ink); background: rgba(255,255,255,.75); padding: 2px 12px; border-radius: 999px; }
+.band .spacer { flex: 1; }
+.where { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.88); color: #4c2350; border-radius: 999px; padding: 8px 14px; font: 600 .78rem var(--sans); letter-spacing: .12em; text-transform: uppercase; }
+.where .dot { width: 8px; height: 8px; border-radius: 50%; background: #3f7d4e; }
+.site-link { color: var(--ink); background: rgba(255,255,255,.75); padding: 8px 14px; border-radius: 999px; font: 600 .78rem var(--sans); letter-spacing: .1em; text-transform: uppercase; text-decoration: none; }
+.site-link:hover { text-decoration: underline; }
+@media (max-width: 640px) { .band .title, .site-link { display: none; } .band .logo { width: 116px; height: 36px; } .band-in { flex-wrap: nowrap; gap: 8px; } .games-btn, .where { padding: 7px 11px; font-size: .7rem; letter-spacing: .06em; white-space: nowrap; } }
+
+/* ---------- Shell ---------- */
+.shell { max-width: 1440px; margin: 0 auto; display: grid; grid-template-columns: 210px minmax(0, 1fr) clamp(300px, 26vw, 370px); gap: 28px; padding: 22px var(--gr) 40px var(--gl); align-items: start; }
+.rail, .panel { position: sticky; top: 16px; max-height: calc(100vh - 32px); overflow: auto; }
+@media (max-width: 1180px) { .shell { grid-template-columns: minmax(0, 1fr); } .rail, .panel { display: none; } }
+
+/* Category rail */
+.rail h3 { font: 600 .7rem var(--sans); letter-spacing: .24em; text-transform: uppercase; color: var(--ink-soft); margin: 4px 10px 10px; }
+.rail button { display: flex; justify-content: space-between; width: 100%; text-align: left; border: 0; background: transparent; padding: 9px 12px; border-radius: 10px; cursor: pointer; font-size: .95rem; }
+.rail button span { color: var(--ink-soft); font-size: .8rem; font-variant-numeric: tabular-nums; }
+.rail button:hover { background: var(--plate); }
+.rail button.on { background: var(--accent); color: var(--accent-ink); }
+.rail button.on span { color: inherit; opacity: .75; }
+
+/* Search + chips */
+.tools { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: linear-gradient(var(--bg) 85%, transparent); padding-block: 4px 10px; margin-inline: -4px; padding-inline: 4px; }
+.search { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 14px; padding: 0 14px; }
+.search svg { flex: 0 0 auto; width: 18px; height: 18px; stroke: var(--ink-soft); }
+.search input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--ink); font: 400 1rem var(--sans); padding: 13px 0; outline: none; }
+.search input::placeholder { color: var(--ink-soft); }
+.search button { border: 0; background: transparent; cursor: pointer; color: var(--ink-soft); font-size: .85rem; }
+.chips { display: none; gap: 8px; overflow-x: auto; padding-top: 10px; scrollbar-width: none; }
+.chips::-webkit-scrollbar { display: none; }
+.chip { flex: 0 0 auto; border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 14px; font: 500 .85rem var(--sans); cursor: pointer; }
+.chip.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+@media (max-width: 1180px) { .chips { display: flex; } }
+
+/* Sections + cards */
+section.cat { padding-top: 26px; scroll-margin-top: 130px; }
+.cat-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.cat-head h2 { font: 400 clamp(1.6rem, 3vw, 2.1rem)/1.1 var(--serif); text-transform: uppercase; margin: 0; letter-spacing: .02em; }
+.cat-head p { margin: 0; font: italic 500 1.15rem var(--script); color: var(--ink-soft); }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.card { position: relative; display: flex; flex-direction: column; text-align: left; background: var(--card); border: 1.5px solid var(--line); border-radius: 18px; padding: 0; cursor: pointer; overflow: hidden; transition: transform .2s, box-shadow .2s, border-color .2s; }
+.card:hover { transform: translateY(-3px); box-shadow: 0 16px 30px -18px var(--shadow); border-color: color-mix(in srgb, var(--gold) 50%, var(--line)); }
+.card .pic { height: 170px; display: grid; place-items: center; background: radial-gradient(circle at 50% 60%, var(--plate) 0 58%, transparent 59%), var(--surface); }
+.card .pic img { height: 150px; width: auto; object-fit: contain; filter: drop-shadow(0 10px 10px var(--shadow)); transition: transform .3s; }
+.card:hover .pic img { transform: scale(1.06) rotate(-2deg); }
+.card .pic .mono { font: 400 2.4rem var(--serif); color: var(--ink-soft); }
+.card .body { padding: 12px 14px 14px; display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.card .name { font: 400 1.02rem/1.2 var(--serif); text-transform: uppercase; letter-spacing: .02em; }
+.card .desc { font: italic 500 1.02rem/1.25 var(--script); color: var(--ink-soft); }
+.card .foot { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 10px; }
+.price { font: 600 .9rem var(--sans); letter-spacing: .04em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.price small { font-weight: 500; color: var(--ink-soft); letter-spacing: .06em; text-transform: uppercase; font-size: .7rem; margin-right: 4px; }
+.plus { width: 36px; height: 36px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 1.3rem; line-height: 1; cursor: pointer; transition: transform .15s; }
+.plus:hover { transform: scale(1.1); }
+.incart { position: absolute; top: 10px; left: 10px; background: var(--accent); color: var(--accent-ink); font: 600 .72rem var(--sans); letter-spacing: .06em; padding: 3px 9px; border-radius: 999px; }
+.empty-search { padding: 50px 10px; text-align: center; color: var(--ink-soft); }
+.empty-search b { display: block; font: 400 1.4rem var(--serif); color: var(--ink); margin-bottom: 4px; }
+
+/* Phone: horizontal list cards */
+@media (max-width: 640px) {
+  .grid { grid-template-columns: 1fr; gap: 10px; }
+  .card { flex-direction: row; align-items: stretch; border-radius: 14px; }
+  .card .pic { flex: 0 0 96px; height: auto; min-height: 104px; background: var(--plate); }
+  .card .pic img { height: 88px; }
+  .card .body { padding: 10px 12px; }
+  .card .name { font-size: .98rem; }
+  .card .foot { padding-top: 6px; }
+  .incart { top: 6px; left: 6px; font-size: .66rem; }
+  section.cat { scroll-margin-top: 120px; }
+}
+
+/* ---------- Order panel (desktop) and shared order body ---------- */
+.panel { background: var(--surface); border: 1.5px solid var(--line); border-radius: 20px; padding: 20px; box-shadow: 0 20px 40px -30px var(--shadow); }
+.order h3 { font: 400 1.5rem var(--serif); text-transform: uppercase; margin: 0 0 4px; }
+.order .sub { color: var(--ink-soft); font-size: .88rem; margin: 0 0 12px; }
+.order .none { text-align: center; padding: 26px 8px; color: var(--ink-soft); }
+.order .none .cup { width: 84px; height: 84px; margin: 0 auto 10px; border-radius: 50%; background: var(--plate); display: grid; place-items: center; font: 400 2rem var(--display); color: var(--ink-soft); }
+.line { display: grid; grid-template-columns: 1fr auto; gap: 2px 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.line .n { font: 400 .98rem/1.25 var(--serif); text-transform: uppercase; }
+.line .x { grid-column: 1; color: var(--ink-soft); font-size: .82rem; }
+.line .lp { font-weight: 600; font-variant-numeric: tabular-nums; }
+.step { grid-column: 2; grid-row: 2; display: flex; align-items: center; gap: 4px; justify-self: end; }
+.step button { width: 28px; height: 28px; border-radius: 8px; border: 1.5px solid var(--line); background: transparent; cursor: pointer; }
+.step output { min-width: 20px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+.totals { display: flex; justify-content: space-between; padding: 14px 0 6px; font: 600 1.05rem var(--sans); font-variant-numeric: tabular-nums; }
+.note { color: var(--ink-soft); font-size: .8rem; margin: 0 0 12px; }
+.field { display: grid; gap: 6px; margin-top: 12px; }
+.field > span { font: 600 .68rem var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); }
+.field select, .field input, .field textarea { font: 400 .95rem var(--sans); color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 12px; padding: 11px 12px; width: 100%; }
+.place { width: 100%; margin-top: 16px; border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-ink); padding: 15px 18px; font: 600 1rem var(--sans); display: flex; justify-content: space-between; cursor: pointer; }
+.place[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* ---------- Bottom bar (tablet + phone) ---------- */
+.bar { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; display: flex; justify-content: center; pointer-events: none;
+  padding: 12px var(--gr) calc(12px + env(safe-area-inset-bottom, 0px)) var(--gl); }
+.bar button { pointer-events: auto; width: min(100%, 560px); display: flex; justify-content: space-between; align-items: center; gap: 12px; border: 0; border-radius: 16px; background: var(--accent); color: var(--accent-ink); padding: 15px 20px; font: 600 1rem var(--sans); cursor: pointer; box-shadow: 0 12px 30px -10px var(--shadow); }
+.bar .count { background: var(--accent-ink); color: var(--accent); border-radius: 999px; padding: 1px 9px; margin-right: 8px; font-size: .85rem; }
+@media (min-width: 1181px) { .bar { display: none; } }
+/* reserve room under the last item while the order bar floats over the page */
+@media (max-width: 1180px) { body.has-bar .shell { padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); } }
+
+/* ---------- Layer: modal (desktop), drawer (tablet), sheet (phone) ---------- */
+.scrim { position: fixed; inset: 0; z-index: 40; background: rgba(20, 8, 22, .5); display: flex; align-items: center; justify-content: center; padding: 20px; }
+.dialog.small { width: min(100%, 420px); display: block; padding: 26px; }
+.dialog { width: min(100%, 720px); max-height: min(90vh, 760px); overflow: auto; background: var(--surface); border-radius: 22px; box-shadow: 0 40px 80px -30px rgba(0,0,0,.5); display: grid; grid-template-columns: 1fr 1.1fr; }
+.dialog .hero { background: radial-gradient(circle at 50% 55%, var(--plate) 0 60%, var(--bg) 61%); display: grid; place-items: center; padding: 30px; min-height: 300px; }
+.dialog .hero img { max-height: 300px; width: auto; filter: drop-shadow(0 18px 16px var(--shadow)); }
+.dialog .hero .mono { font: 400 4rem var(--serif); color: var(--ink-soft); }
+.dialog .info { padding: 26px 26px 22px; display: flex; flex-direction: column; min-width: 0; }
+.dialog h3 { font: 400 1.7rem/1.1 var(--serif); text-transform: uppercase; margin: 0; }
+.dialog .desc { font: italic 500 1.2rem var(--script); color: var(--ink-soft); margin: 4px 0 0; }
+.x-close { position: absolute; top: 14px; right: 14px; width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--surface); box-shadow: 0 4px 12px var(--shadow); cursor: pointer; font-size: 1.2rem; z-index: 2; }
+fieldset { border: 0; padding: 0; margin: 18px 0 0; display: grid; gap: 8px; }
+legend { font: 600 .68rem var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 8px; }
+.opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.opt { display: flex; align-items: center; justify-content: space-between; gap: 8px; border: 1.5px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; font-size: .92rem; }
+.opt:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.opt input { accent-color: var(--accent); margin: 0 8px 0 0; }
+.opt > span:first-child { display: flex; align-items: center; }
+.opt .p { color: var(--ink-soft); font-weight: 600; font-size: .85rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.addrow { display: flex; gap: 12px; align-items: center; margin-top: auto; padding-top: 20px; }
+.qty { display: flex; align-items: center; border: 1.5px solid var(--line); border-radius: 14px; }
+.qty button { width: 42px; height: 48px; border: 0; background: transparent; font-size: 1.3rem; cursor: pointer; }
+.qty output { min-width: 26px; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; }
+.addbtn { flex: 1; border: 0; border-radius: 14px; background: var(--accent); color: var(--accent-ink); padding: 15px 18px; font: 600 1rem var(--sans); display: flex; justify-content: space-between; cursor: pointer; }
+
+.drawer { position: fixed; z-index: 41; top: 0; right: 0; bottom: 0; width: min(420px, 100%); background: var(--surface); overflow: auto; padding: calc(22px + env(safe-area-inset-top, 0px)) max(22px, env(safe-area-inset-right, 0px)) calc(22px + env(safe-area-inset-bottom, 0px)) 22px; box-shadow: -30px 0 60px -30px rgba(0,0,0,.5); }
+
+@media (max-width: 640px) {
+  .scrim { align-items: flex-end; padding: 0; }
+  .dialog { grid-template-columns: 1fr; border-radius: 22px 22px 0 0; max-height: 92%; }
+  .dialog .hero { min-height: 190px; padding: 18px; }
+  .dialog .hero img { max-height: 170px; }
+  .dialog .info { padding: 18px max(18px, env(safe-area-inset-right, 0px)) calc(18px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left, 0px)); }
+  .drawer { top: auto; width: 100%; max-height: 92%; border-radius: 22px 22px 0 0; }
+}
+
+/* ---------- Toast ---------- */
+.toast { position: fixed; z-index: 50; left: 50%; top: calc(16px + env(safe-area-inset-top, 0px)); transform: translate(-50%, -150%); background: var(--accent); color: var(--accent-ink); padding: 11px 18px; border-radius: 999px; font: 500 .9rem var(--sans); box-shadow: 0 10px 30px -10px var(--shadow); transition: transform .3s cubic-bezier(.2, 1.4, .4, 1); }
+.toast.show { transform: translate(-50%, 0); }
+
+/* ---------- Order placed ---------- */
+.done { max-width: 760px; margin: 10px auto 0; text-align: center; }
+.done .tick { width: 84px; height: 84px; margin: 10px auto 10px; border-radius: 50%; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-size: 2.4rem; }
+.done .ref { font: 600 .78rem var(--sans); letter-spacing: .24em; text-transform: uppercase; color: var(--ink-soft); }
+.done h2 { font: 400 clamp(2rem, 4vw, 2.8rem) var(--serif); text-transform: uppercase; margin: 4px 0; }
+.done .lead { font: italic 500 1.3rem var(--script); color: var(--ink-soft); margin: 0 0 20px; }
+.receipt { text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: 18px; padding: 6px 18px 12px; }
+.done.compact { display: grid; grid-template-columns: auto 1fr; gap: 4px 16px; align-items: center; text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: 18px; padding: 16px 18px; max-width: none; }
+.done.compact .tick { width: 54px; height: 54px; margin: 0; font-size: 1.6rem; grid-row: span 2; }
+.done.compact h2 { font-size: clamp(1.4rem, 3vw, 1.8rem); margin: 0; }
+.done.compact .lead { margin: 0; font-size: 1.1rem; grid-column: 2; }
+.done.compact details { grid-column: 1 / -1; margin-top: 8px; }
+.done.compact summary { cursor: pointer; font: 600 .82rem var(--sans); letter-spacing: .08em; color: var(--ink-soft); padding: 6px 0; }
+.games { margin-top: 22px; text-align: left; }
+.games-head { display: flex; align-items: end; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+.games h2 { font: 400 clamp(1.7rem, 3.4vw, 2.3rem)/1.05 var(--serif); text-transform: uppercase; margin: 0; }
+.games .sub2 { margin: 4px 0 0; font: italic 500 1.15rem var(--script); color: var(--ink-soft); }
+.live { display: inline-flex; align-items: center; gap: 7px; font: 600 .7rem var(--sans); letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft); }
+.live i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 rgba(63,125,78,.5); animation: pulse 2s infinite; }
+.live.off i { background: #c0563f; animation: none; }
+@keyframes pulse { 70% { box-shadow: 0 0 0 8px rgba(63,125,78,0); } 100% { box-shadow: 0 0 0 0 rgba(63,125,78,0); } }
+.mygame { display: flex; align-items: center; gap: 14px; background: var(--accent); color: var(--accent-ink); border-radius: 16px; padding: 14px 16px; margin-bottom: 14px; }
+.mygame .box { width: 52px; height: 52px; border-radius: 12px; flex: 0 0 auto; display: grid; place-items: center; }
+.mygame .box svg { width: 34px; height: 34px; }
+.mygame b { display: block; font: 400 1.15rem var(--serif); text-transform: uppercase; }
+.mygame span { font-size: .9rem; opacity: .85; }
+.shelf { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.game { display: flex; flex-direction: column; text-align: left; border: 1.5px solid var(--line); background: var(--surface); border-radius: 16px; padding: 0; overflow: hidden; cursor: pointer; transition: transform .2s, box-shadow .2s; }
+.game:hover:not([disabled]) { transform: translateY(-3px); box-shadow: 0 14px 26px -16px var(--shadow); }
+.game[disabled] { cursor: not-allowed; opacity: .5; }
+.game .box { aspect-ratio: 4 / 3; display: grid; place-items: center; position: relative; }
+.game .box svg { width: 46%; height: auto; }
+.game .box::after { content: ""; position: absolute; inset: 8px; border: 1.5px solid rgba(255,255,255,.45); border-radius: 10px; }
+.game .gi { padding: 10px 12px 12px; }
+.game .gn { font: 400 1rem/1.15 var(--serif); text-transform: uppercase; }
+.game .gm { font-size: .78rem; color: var(--ink-soft); margin-top: 2px; }
+.game .ask { margin-top: 8px; font: 600 .74rem var(--sans); letter-spacing: .08em; color: var(--accent); }
+.away { margin-top: 12px; font-size: .85rem; color: var(--ink-soft); }
+.gconfirm { text-align: center; padding: 6px 4px 2px; }
+.gconfirm .box { width: 120px; height: 90px; border-radius: 14px; margin: 0 auto 14px; display: grid; place-items: center; }
+.gconfirm .box svg { width: 56px; }
+.gconfirm h3 { font: 400 1.6rem var(--serif); text-transform: uppercase; margin: 0 0 4px; }
+.gconfirm p { margin: 0 0 18px; color: var(--ink-soft); }
+.gconfirm .row { display: flex; gap: 10px; }
+.gconfirm .row button { flex: 1; }
+.pickup-note { background: var(--plate); border-radius: 12px; padding: 10px 12px; font-size: .85rem; margin: 0 0 4px; }
+body.co-mode .rail, body.co-mode .panel { display: none !important; }
+body.co-mode .shell { grid-template-columns: minmax(0, 1fr); }
+.co-top { max-width: 980px; margin: 0 auto 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.steps3 { display: flex; align-items: center; gap: 8px; list-style: none; margin: 0; padding: 0; font: 600 .78rem var(--sans); color: var(--ink-soft); }
+.steps3 li { display: flex; align-items: center; gap: 6px; }
+.steps3 b { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--line); font-size: .75rem; }
+.steps3 li.ok b { background: var(--ok); border-color: var(--ok); color: #fff; }
+.steps3 li.now { color: var(--ink); } .steps3 li.now b { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.steps3 i { width: 18px; height: 1.5px; background: var(--line); }
+@media (max-width: 480px) { .steps3 span { display: none; } }
+.checkout { max-width: 980px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 860px) { .checkout { grid-template-columns: 1fr; } }
+.co-back { border: 0; background: none; color: var(--ink-soft); font: 600 .8rem var(--sans); letter-spacing: .1em; text-transform: uppercase; padding: 4px 0 12px; cursor: pointer; }
+.co-card { background: var(--surface); border: 1.5px solid var(--line); border-radius: 20px; padding: 20px; }
+.co-card h2 { font: 400 clamp(1.5rem, 3vw, 2rem)/1.1 var(--serif); text-transform: uppercase; margin: 0 0 4px; }
+.co-card .hint { color: var(--ink-soft); margin: 0 0 14px; font-size: .9rem; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 6px; }
+.seg label { display: flex; flex-direction: column; gap: 2px; border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; cursor: pointer; }
+.seg label:has(input:checked) { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 7%, transparent); }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg b { font: 400 1.1rem var(--serif); text-transform: uppercase; }
+.seg span { font-size: .82rem; color: var(--ink-soft); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media (max-width: 480px) { .row2 { grid-template-columns: 1fr; } }
+.field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--accent); }
+.field .err { color: #b2442f; font-size: .8rem; }
+.locbtn { margin-top: 10px; border: 1.5px dashed var(--line); background: transparent; border-radius: 12px; padding: 11px 12px; width: 100%; text-align: left; font: 500 .9rem var(--sans); cursor: pointer; }
+.locbtn.ok { border-style: solid; border-color: var(--ok); color: var(--ok); }
+.co-sum .line .step { display: none; }
+.spin { display: inline-block; width: 15px; height: 15px; border: 2.5px solid currentColor; border-right-color: transparent; border-radius: 50%; vertical-align: -3px; margin-right: 8px; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.inorder { margin-top: 14px; border: 1.5px solid var(--line); border-radius: 14px; padding: 10px; display: grid; gap: 6px; background: var(--bg); }
+.io-h { font: 600 .66rem var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); padding: 0 4px 2px; }
+.io { display: flex; justify-content: space-between; gap: 10px; text-align: left; border: 1.5px solid transparent; background: var(--surface); border-radius: 10px; padding: 9px 10px; font: 500 .88rem var(--sans); cursor: pointer; }
+.io.on { border-color: var(--accent); }
+.io.add { justify-content: center; color: var(--accent); font-weight: 600; background: transparent; border-style: dashed; border-color: var(--line); }
+.io.add.on { border-style: solid; border-color: var(--accent); }
+.remove { margin-top: 12px; align-self: center; display: inline-flex; align-items: center; gap: 8px; border: 0; background: none; color: #b2442f; font: 600 .88rem var(--sans); cursor: pointer; padding: 8px 10px; border-radius: 10px; }
+.remove:hover { background: #fbe9e5; }
+.line .edit { border: 0; background: none; padding: 0; text-align: left; cursor: pointer; color: inherit; }
+.line .edit:hover { text-decoration: underline; }
+.line .change { border: 0; background: none; padding: 0; color: var(--accent); font: 600 .8rem var(--sans); cursor: pointer; text-decoration: underline; }
+.step .bin { color: #b2442f; display: grid; place-items: center; margin-right: 4px; }
+.games-btn { border: 0; background: rgba(255,255,255,.88); color: #4c2350; border-radius: 999px; padding: 8px 14px; font: 600 .78rem var(--sans); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
+.again { margin-top: 26px; border: 1.5px solid var(--line); background: transparent; border-radius: 14px; padding: 13px 20px; cursor: pointer; font-weight: 500; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+</head>
+<body>
+<header class="band">
+  <div class="band-in">
+    <a href="https://rehan-saleh.github.io/poffies/" aria-label="Poffies website"><img class="logo" src="https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/7cc4d0bbe94bf8bdaeb9cad622a82997.png" alt="Poffies"></a>
+    <span class="title">Menu</span>
+    <span class="spacer"></span>
+    <button class="games-btn" type="button" id="gamesBtn" hidden>Board games</button>
+    <span class="where" id="where" hidden><span class="dot"></span><span id="whereTxt"></span></span>
+    <a class="site-link" href="https://rehan-saleh.github.io/poffies/">Our website</a>
+  </div>
+</header>
+
+<div class="shell" id="shell">
+  <nav class="rail" id="rail" aria-label="Menu sections"></nav>
+  <main id="main">
+    <div class="tools" id="tools">
+      <label class="search" for="q">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Search the menu, e.g. pistachio, iced, matcha" autocomplete="off">
+        <button type="button" id="qClear" hidden>Clear</button>
+      </label>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div id="menu"></div>
+  </main>
+  <aside class="panel" id="panel" aria-label="Your order"></aside>
+</div>
+
+<div class="bar" id="bar" hidden><button type="button" id="openOrder"><span><span class="count" id="barCount">0</span>View your order</span><span id="barTotal"></span></button></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div id="layer"></div>
+
+<script src="live.js?v=5"></script>
+<script>
+
+/* ---------- Menu data, copied from the Poffies Canva menu (Oct 2026) ---------- */
+const EXTRAS = ['Extra Shot','Vanilla Syrup','Hazelnut Syrup','Caramel Syrup','Caramel Sauce','Chocolate Sauce','Whipped Cream','Sweet Cold Foam','Oat Milk','Almond Milk','Soy Milk','Lactose Free Milk'].map(n => ({ n, p: 5 }));
+const POFF_SIZES = [{ n: '9 pcs', p: 32 }, { n: 'Box of 16', p: 48 }, { n: '30 pcs', p: 82 }, { n: 'Box of 60', p: 145 }];
+
+const MENU = [
+  { id: 'hot', t: 'Hot Coffees', b: 'Classic hot espresso drinks', extras: true, items: [
+    ['Single Espresso','Rich & Intense',14],['Double Espresso','Bold & Rich',18],['Americano','Smooth & Bold',18],['Cappuccino','Creamy & Foamy',19],
+    ['Dry Cappuccino','Foamy & Bold',23],['Latte','Smooth & Creamy',22],['Flat White','Velvety & Smooth',24],['Cortado','Rich & Balanced',19],
+    ['Piccolo','Bold & Creamy',18],['Spanish Latte','Bold & Creamy',24],['Cinnamon Latte','Warm & Spiced',24],['Hot Chocolate','Rich & Creamy',23],
+    ['Mocha','Chocolatey & Smooth',23],['White Mocha','Sweet & Velvety',24],['Macchiato','Bold & Smooth',18],['Caramel Macchiato','Caramel & Creamy',20],
+    ['V60','Refined & Aromatic',28]] },
+  { id: 'iced', t: 'Iced Coffees', b: 'Classic cold espresso drinks', extras: true, items: [
+    ['Iced Americano','Rich & Intense',22],['Iced Latte','Chilled & Creamy',24],['Iced Spanish Latte','Sweet & Refreshing',26],['Iced Cinnamon Latte','Chilled & Spiced',26],
+    ['Iced Mocha','Chocolatey & Chilled',25],['Iced White Mocha','Sweet & Velvety',26],['Iced Macchiato','Bold & Creamy',22],['Iced Caramel Macchiato','Sweet & Caramelized',24],
+    ['Iced Cold Brew','Bold & Refreshing',24],['Iced V60','Aromatic & Elevated',32]] },
+  { id: 'sig', t: 'Signature Drinks', b: 'Our most beloved drinks', extras: true, items: [
+    ['Oh My Fig Latte','Sweet & Figgy',30],['Maple Kiss Latte','Warm & Cozy',30],['Crush On Blush Latte','Floral & Creamy',29],['Zesty Hot Cocoa','Orange Goodness',28],
+    ['Jasmin Midnight Iced Latte','Floral & Mysterious',32],['Silky Pistachio Iced Latte','Nutty & Silky',32],['Rose Velvet Iced Latte','Velvety & Floral',30],['Orange Cloud Iced Latte','Sweet & Citrusy',32]] },
+  { id: 'matcha', t: 'Matcha', b: 'Ceremonial grade matcha favourites', items: [
+    ['Hot Matcha Latte','Ceremonial Grade Matcha & Milk',23],['Iced Matcha Latte','Ceremonial Grade Matcha & Milk',24],['Passion Iced Matcha Latte','Matcha & Touch of Passion',27],
+    ['Strawberry Iced Matcha Latte','Matcha & Touch of Strawberries',27],['Mango-Coco Matcha Cloud','Mango, Coconut & Crispy Rice',36],['Maple-Berry Matcha Cloud','Strawberry, Maple & Crispy Biscuit',36]] },
+  { id: 'poffies', t: 'Signature Poffies', b: 'Little bites made to crave', group: 'Poffies', sizes: POFF_SIZES, items: [
+    ['Choco-Loco','Hazelnut & White Chocolate'],['Cookie N’Creme','Oreo Crumble & White Chocolate'],['Maple Drip','Canadian Maple Syrup & Pecan'],['Biscoff Crumble','Lotus Biscoff Sauce & Biscuits'],
+    ['Caramel Cheesecake','Caramel & Cheesecake Sauce'],['Strawberry Shortcake','Strawberry & Cheesecake Sauce'],['Cinnaswirl','Sugar & Cinnamon'],['Pistachio Dream','Pistachio Sauce & White Chocolate'],
+    ['Nutty Date','Dates, Honey & Walnuts'],['Kinderella','Kinder Chocolate Sauce']] },
+  { id: 'poffertjes', t: 'Signature Poffertjes', b: 'Freshly made Dutch mini pancakes', group: 'Poffertjes', sizes: POFF_SIZES, items: [
+    ['Biscoff Crunch','Biscoff Sauce & Biscuits'],['Strawberry Shortcake','Strawberry & Cheesecake Sauce'],['Maple Leaf','Canadian Original Maple Syrup'],
+    ['Choco-Loco','Hazelnut Chocolate, Strawberries & Banana'],['Kinderella','Kinder Chocolate Sauce & Strawberries'],['Caramel Cheesecake','Caramel & Cheesecake Sauce']] },
+  { id: 'croffles', t: 'Signature Croffles', b: 'Flaky, crispy & dreamy', group: 'Croffle', sizes: [{ n: '1 pc', p: 30 }, { n: 'Box of 3', p: 80 }], items: [
+    ['Kinderella','Mascarpone & Kinder Cream'],['Oreo Crush','Mascarpone & Oreo Cream'],['Strawberry Matcha','Mascarpone & Matcha Cream'],
+    ['Choco-Nana','Mascarpone & Nutella'],['Blisscoff','Mascarpone & Lotus Biscoff Cream'],['Pistachio Crunch','Mascarpone & Pistachio Cream']] },
+  { id: 'pastry', t: 'Fresh Pastries', b: 'Freshly baked every day with love', items: [
+    ['Croissant','Fresh Butter Croissant',15],['Cheese Croissant','Butter Cheese Croissant',17],['Pain au Chocolat','Chocolate Croissant',15],
+    ['Chocolate Chip Vanilla Muffin','Vanilla & Chocolate Goodness',15],['Triple Chocolate Muffin','Decadent Chocolate Muffin',16],['Blueberry Muffin','Fresh Blueberries Muffin',15],
+    ['Brownie Bomb','Fudgy Decadent Brownie',19],['Hazelnut Bliss Cookie','Hazelnut Chunks & Chocolate',19],['Macadamia Dream Cookie','Macadamia Nuts & White Chocolate',20],
+    ['Dark Melt Cookie','Dark Chocolate & Sea Salt Flakes',20]] },
+  { id: 'refresh', t: 'Refreshers', b: 'Your daily refreshing dose', items: [
+    ['Golden Lemonade','Tropical Vibe',24],['Pink Lemonade','Strawberry Goodness',23],['Strawberry Crush Mojito','Fresh Berry',25],['Passion Burst Mojito','Passion Lime',25],
+    ['Mint Margarita','Zesty & Refreshing',25],['Passion Splash Iced Tea','Refreshing & Vibrant',24],['Strawberry Kiss Iced Tea','Fruity Iced Tea',25],['Lavender Bloom Iced Tea','Lavender Bliss',28]] },
+  { id: 'sigref', t: 'Signature Refreshers', b: 'Sip the unexpected', items: [
+    ['Bloomberry','Mixed Berries Refresher',30],['Roseberry Bloom','Chilled & Floral',32],['Green Crisp','Fresh Cucumber',28],['Ruby Fizz','Pomegranate Goodness',30]] },
+  { id: 'smooth', t: 'Smoothies', b: 'Blended goodness', items: [
+    ['Tropical Rush Smoothie','Tropical & Creamy',30],['Coco Avocado Smoothie','Creamy & Coconuty',29],['Mango Dragon Smoothie','Sweet & Refreshing',32],
+    ['Green Glow Smoothie','Fresh Boost',32],['Berry Bliss Smoothie','Lovely Blend',30]] },
+  { id: 'shake', t: 'Milkshake & Frappe', b: 'Creamy, indulgent & delicious', items: [
+    ['Vanilla Cloud Milkshake','Sweet & Creamy',23],['Berry-Blush Milkshake','Fruity & Smooth',25],['Choco-Loco Milkshake','Creamy & Chocolatey',28],
+    ['Pista’o Clock Milkshake','Nutty & Luxurious',32],['Coffee Kick Frappe','',28],['Waferlicious Frappe','Crunchy Hazelnut',25],['Bean-Me-Up Coffee Frappe','Bold & Energizing',26]] },
+  { id: 'tea', t: 'Tea', b: 'Comforting selection of classic tea', items: [
+    ['Majestic Earl Grey','Sicilian Bergamot, Orange & Black Tea',25],['Organic English Breakfast','Malty Assam, Fruity Ceylon & Honeyed Yunnan',25],
+    ['Organic Chamomile Cooler','Whole Chamomile Flowers & Peppermint',25],['Organic Mint Duo','North African Nana Mint & Peppermint',25],
+    ['Moroccan Mint','Gunpowder & Moroccan Nana Mint Leaves',25],['Rose White','Pai Mu Tan White Tea & Rose Petals',25],['Rush Hour Berry','Garden & Forest Berries',25],
+    ['Organic Masala Spice Chai','Indian Black Teas & Masala Spices',25],['Organic Ginger Breeze','Lemongrass, Orange Peel & Ginger',25],['Organic Spring Mao Feng','Smooth & elegant, soft nutty notes',25]] }
+];
+
+
+
+const PHOTOS = {"hot-single-espresso": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/25f8a785f483a081699a9d595a0a8b75.png", "hot-double-espresso": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/25f8a785f483a081699a9d595a0a8b75.png", "hot-americano": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/00260a20ecef75f56f040b5e8db91342.png", "hot-cappuccino": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3058d1369146cad4c6f50dcffad56087.png", "hot-dry-cappuccino": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/18c88650ba79495ebb744e76b64cb356.png", "hot-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/50205ce553d7b24db2adfbd9e1aad65d.png", "hot-flat-white": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/fb14eea7629e98a493ee6eadd6d3322e.png", "hot-cortado": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/9196c889dcc41275e2e777aa86f863cc.png", "hot-piccolo": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/ed9895223856f08b99a55fb9db3cd47f.png", "hot-spanish-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3058d1369146cad4c6f50dcffad56087.png", "hot-cinnamon-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/aaaa0fc10431d1440516d289fdec3fd4.png", "hot-hot-chocolate": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/70ce822ca61c54089dddc217d74a1ec9.png", "hot-mocha": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/18beb28d0d87e8189b72d0c330c50b93.png", "hot-white-mocha": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/50205ce553d7b24db2adfbd9e1aad65d.png", "hot-macchiato": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/8bee392ef6cb2744d0b2bdb63866614f.png", "hot-caramel-macchiato": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/89d254cca4d68963d8feefecc5dde572.png", "hot-v60": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/83d12006f86bfdf85b52a8696d81c3b2.png", "iced-iced-americano": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/5ddb2c6716d8c95c78f307eaaf37d18b.png", "iced-iced-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/e90e6ed84c7a674250d7ae12810ab0d8.png", "iced-iced-spanish-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/4a42346ab9a53544916e67418c2fc34f.png", "iced-iced-cinnamon-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/c6596ad32c7620efe5efc589633114e7.png", "iced-iced-mocha": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/621651dbf3297f0a3687c61190c82f48.png", "iced-iced-white-mocha": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/6ad974c1c88c03751dfead138e37d0f0.png", "iced-iced-macchiato": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/472f34659fab63831706e9a14b6672cd.png", "iced-iced-caramel-macchiato": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/dee01f3a370e44db680a63896a59a3a6.png", "iced-iced-cold-brew": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/d09afc3fa4f48d217f0414c858fd8e12.png", "iced-iced-v60": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/6dbfc5cf3da03180696e4297133116db.png", "sig-oh-my-fig-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/d5f8136a2d58a44a38e20cb74953c3c2.png", "sig-maple-kiss-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/56f8728a83ebc072d11a639ad322c2b0.png", "sig-crush-on-blush-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/26445e23a86eb5a650bce135d01af892.png", "sig-zesty-hot-cocoa": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/4122f77213c9aa8ffb285c565bcffa52.png", "sig-jasmin-midnight-iced-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/f5248e43a0d0da1af49e91255d8f48e0.png", "sig-silky-pistachio-iced-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/a693ebe0ccd77c317b337a8fc5b8d836.png", "sig-rose-velvet-iced-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/e86d38988a6365e24b71807bec1cef40.png", "sig-orange-cloud-iced-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/4239f4a7e8d1502c6aa36080569cc499.png", "matcha-hot-matcha-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/aa5147eb2eda79fec0f084521c05829c.png", "matcha-iced-matcha-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/b7d14aa3ae10afe0b8a8f1b2127a94fc.png", "matcha-passion-iced-matcha-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/a61f9a4ee5bde813603c7713e30bb176.png", "matcha-strawberry-iced-matcha-latte": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/44c3b627cf80b8f2139462145eaebc89.png", "matcha-mango-coco-matcha-cloud": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/29a86aa8212e6005a2f01760bfe5b740.png", "matcha-maple-berry-matcha-cloud": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3625e21be03aed905d0fc60bd96ebb57.png", "pastry-croissant": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/35cfa79f7c2f6018914390f28da74004.png", "pastry-cheese-croissant": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/d1c6b5cc10ae7226e6cb81c28a50cdbf.png", "pastry-pain-au-chocolat": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/36321957aa8c407818aa079367ad3529.png", "pastry-chocolate-chip-vanilla-muffin": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/d872dd87c2166ac2ee369e7424958bf9.png", "pastry-triple-chocolate-muffin": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/0604b583341dfb26b9b2ca1de79e0512.png", "pastry-blueberry-muffin": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/cc86f77cc0d95465a3531978ca7a035c.png", "pastry-brownie-bomb": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/56c57c6b49ee75c01085b95046a97a10.png", "pastry-hazelnut-bliss-cookie": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/d72a0a98b3b91049f38cc63fded69b1c.png", "pastry-macadamia-dream-cookie": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/ccb8d51f86a9d25fd61bd3ba8fb07e76.png", "pastry-dark-melt-cookie": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/1289795a9dc7fe9659df00cce3126fa6.png", "refresh-golden-lemonade": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/deb0772625170d001a3770e19f1edb03.png", "refresh-pink-lemonade": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/13dee74e0e534daea8a8046cc459aff0.png", "refresh-strawberry-crush-mojito": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/d28ffda143f55838c1a270ea085cf8a1.png", "refresh-passion-burst-mojito": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/47681fb08a1232bacd84905be612ff5a.png", "refresh-mint-margarita": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/f5655ee46b4d1f64aa5d31c38bf646dd.png", "refresh-passion-splash-iced-tea": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/2a48a18ed8a82a616a55c1c352b13f3c.png", "refresh-strawberry-kiss-iced-tea": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/6181fb400c02e1f4e6a615d1876fc235.png", "refresh-lavender-bloom-iced-tea": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/13a8e928060ccbc96e178a2dae40b270.png", "sigref-bloomberry": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/7e54dde1a46f8460c0f9b49eb3fa955c.png", "sigref-roseberry-bloom": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/1bda35ac4b76c457635f59a9472e5834.png", "sigref-green-crisp": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/effa876da4a43a909ed81dbf43c39595.png", "sigref-ruby-fizz": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/6a5b9153bafc23a527bb661791f44214.png", "smooth-tropical-rush-smoothie": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/cc79c7e975f8e214d3f5202b9f487752.png", "smooth-coco-avocado-smoothie": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/7f78a8f556cd292d508a15738f38ac22.png", "smooth-mango-dragon-smoothie": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/e3afa65fce66d79fdcad4f8e9a45587f.png", "smooth-green-glow-smoothie": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/a0feb98334afa8a7113da0b6cd21d677.png", "smooth-berry-bliss-smoothie": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/ba12646856f0df067438436ce9168766.png", "shake-vanilla-cloud-milkshake": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/c1a6a5610c9cf27586be91af9bfa2dde.png", "shake-berry-blush-milkshake": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/174c7a4dfb712dab29fb8a81db59a14d.png", "shake-choco-loco-milkshake": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/54977a0d6c4c4568a5e04b30e4f4965f.png", "shake-pista-o-clock-milkshake": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/d2aa8792be0d83d637515438c5a03bb7.png", "shake-coffee-kick-frappe": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/af4a4684a952f077fd99c37a5d56a409.png", "shake-waferlicious-frappe": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/007e410b4f60dcce9603e123b7815ddb.png", "shake-bean-me-up-coffee-frappe": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/d5fa1261716541a467c81d6476ab899a.png", "tea-majestic-earl-grey": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/cfe816b02b1fc64401770195cab2a19a.png", "tea-organic-english-breakfast": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/200fb06dccfd8f4ae7458dea60822455.png", "tea-organic-chamomile-cooler": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/66e4a079cade4d39e210ca9231fb110f.png", "tea-organic-mint-duo": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/d4ee14ee4f37f378dd906a063beb461b.png", "tea-moroccan-mint": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/7e15e6e407f3b89559491fe0d50f4265.png", "tea-rose-white": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/c24885caad5464766da066e57b2a5ceb.png", "tea-rush-hour-berry": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/06428f3a883299c5b594627c2e6b1c8e.png", "tea-organic-masala-spice-chai": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/47881a21907eab4840442bca68f54c7c.png", "tea-organic-ginger-breeze": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/e195442c36be2192a39a87535f87cd6c.png", "tea-organic-spring-mao-feng": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/5e9be977457533c1119c0caf7aca82ec.png", "poffies-choco-loco": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3c316bc5a784612fef8c2a69ac561f5c.png", "poffies-cookie-n-creme": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3c316bc5a784612fef8c2a69ac561f5c.png", "poffies-maple-drip": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3c316bc5a784612fef8c2a69ac561f5c.png", "poffies-biscoff-crumble": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3c316bc5a784612fef8c2a69ac561f5c.png", "poffies-caramel-cheesecake": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3c316bc5a784612fef8c2a69ac561f5c.png", "poffies-strawberry-shortcake": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3c316bc5a784612fef8c2a69ac561f5c.png", "poffies-cinnaswirl": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3c316bc5a784612fef8c2a69ac561f5c.png", "poffies-pistachio-dream": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3c316bc5a784612fef8c2a69ac561f5c.png", "poffies-nutty-date": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3c316bc5a784612fef8c2a69ac561f5c.png", "poffies-kinderella": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3c316bc5a784612fef8c2a69ac561f5c.png", "poffertjes-biscoff-crunch": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3d86c483f4729b54a288e2d3e1e44693.png", "poffertjes-strawberry-shortcake": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3d86c483f4729b54a288e2d3e1e44693.png", "poffertjes-maple-leaf": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3d86c483f4729b54a288e2d3e1e44693.png", "poffertjes-choco-loco": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3d86c483f4729b54a288e2d3e1e44693.png", "poffertjes-kinderella": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3d86c483f4729b54a288e2d3e1e44693.png", "poffertjes-caramel-cheesecake": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/3d86c483f4729b54a288e2d3e1e44693.png", "croffles-kinderella": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/043c0c4067d71c358edee3ba3b5bb249.png", "croffles-oreo-crush": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/043c0c4067d71c358edee3ba3b5bb249.png", "croffles-strawberry-matcha": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/043c0c4067d71c358edee3ba3b5bb249.png", "croffles-choco-nana": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/043c0c4067d71c358edee3ba3b5bb249.png", "croffles-blisscoff": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/043c0c4067d71c358edee3ba3b5bb249.png", "croffles-pistachio-crunch": "https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/043c0c4067d71c358edee3ba3b5bb249.png"};
+
+/* ---------- Lookups ---------- */
+const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const ITEMS = {};
+MENU.forEach(c => c.items.forEach(([n, d, p]) => {
+  const id = c.id + '-' + slug(n);
+  ITEMS[id] = { id, cat: c, n: c.group ? n + ' ' + c.group : n, short: n, d: d || '', p: c.sizes ? c.sizes[0].p : p, sizes: c.sizes, extras: !!c.extras };
+}));
+const aed = n => n + ' AED';
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const mono = n => n.replace(/[^A-Za-z]/g, '').charAt(0);
+const pic = it => PHOTOS[it.id] ? `<img src="${PHOTOS[it.id]}" alt="" loading="lazy">` : `<span class="mono">${mono(it.short)}</span>`;
+const isDesk = () => matchMedia('(min-width: 1181px)').matches;
+
+/* ---------- Where is the guest? ----------
+   A table only comes from the QR code on that table (#table4). Anyone else, e.g. ordering from home
+   through the website, is a pickup order: no table numbers and no board games. */
+let TABLE = null;
+const tm = (location.hash || '').match(/table(\d{1,2})/i);
+if (tm && +tm[1] >= 1 && +tm[1] <= 11) TABLE = +tm[1];
+const AT_TABLE = TABLE !== null;
+const ORDERED_KEY = 'poffies-ordered-t' + TABLE;
+let hasOrdered = false;
+try { hasOrdered = AT_TABLE && sessionStorage.getItem(ORDERED_KEY) === '1'; } catch (e) {}
+function paintWhere() {
+  document.getElementById('where').hidden = false;
+  document.getElementById('whereTxt').textContent = AT_TABLE ? 'Table ' + TABLE : 'Delivery or pickup';
+  document.getElementById('gamesBtn').hidden = !(AT_TABLE && hasOrdered);
+}
+paintWhere();
+
+/* ---------- Cart ---------- */
+let cart = []; // { key, id, size, extras, qty, unit }
+const count = () => cart.reduce((a, l) => a + l.qty, 0);
+const total = () => cart.reduce((a, l) => a + l.qty * l.unit, 0);
+const qtyOf = id => cart.filter(l => l.id === id).reduce((a, l) => a + l.qty, 0);
+const keyOf = (id, size, extras) => [id, size, extras.join('|')].join('#');
+const optsText = l => [l.size, ...l.extras].filter(Boolean).join(' · ');
+function addLine(id, size, extras, qty, unit) {
+  const key = keyOf(id, size, extras);
+  const l = cart.find(x => x.key === key);
+  if (l) l.qty += qty; else cart.push({ key, id, size, extras, qty, unit });
+  changed(id);
+}
+/* Edit an existing line in place. If the new choices match another line of the same item, merge them. */
+function updateLine(oldKey, size, extras, qty, unit) {
+  const i = cart.findIndex(x => x.key === oldKey); if (i < 0) return;
+  const id = cart[i].id, key = keyOf(id, size, extras);
+  const twin = cart.find(x => x.key === key && x.key !== oldKey);
+  if (twin) { twin.qty += qty; cart.splice(i, 1); }
+  else Object.assign(cart[i], { key, size, extras, qty, unit });
+  changed(id);
+}
+function removeLine(key) {
+  const i = cart.findIndex(x => x.key === key); if (i < 0) return;
+  const id = cart[i].id; cart.splice(i, 1); changed(id);
+}
+function changed(id) { if (id) refreshCard(id); paintOrder(); }
+
+/* ---------- Menu rendering ---------- */
+function card(it) {
+  const q = qtyOf(it.id);
+  return `<div class="card" role="button" tabindex="0" data-open="${it.id}" aria-label="${esc(it.n)}, ${it.sizes ? 'from ' : ''}${aed(it.p)}">
+    ${q ? `<span class="incart">${q} in order</span>` : ''}
+    <div class="pic">${pic(it)}</div>
+    <div class="body">
+      <div class="name">${esc(it.short)}</div>
+      ${it.d ? `<div class="desc">${esc(it.d)}</div>` : ''}
+      <div class="foot"><span class="price">${it.sizes ? '<small>from</small>' : ''}${aed(it.p)}</span>
+        <button class="plus" type="button" data-quick="${it.id}" aria-label="Add ${esc(it.n)}">+</button></div>
+    </div>
+  </div>`;
+}
+function refreshCard(id) { const el = document.querySelector(`[data-open="${id}"]`); if (el) el.outerHTML = card(ITEMS[id]); }
+
+function renderMenu(filter) {
+  const q = (filter || '').trim().toLowerCase();
+  let html = '', any = false;
+  MENU.forEach(c => {
+    const list = c.items.map(([n]) => ITEMS[c.id + '-' + slug(n)]).filter(it => !q || (it.n + ' ' + it.d + ' ' + c.t).toLowerCase().includes(q));
+    if (!list.length) return; any = true;
+    html += `<section class="cat" id="cat-${c.id}" data-cat="${c.id}">
+      <div class="cat-head"><h2>${esc(c.t)}</h2><p>${esc(c.b)}${c.sizes ? ' · choose your size' : ''}</p></div>
+      <div class="grid">${list.map(card).join('')}</div></section>`;
+  });
+  document.getElementById('menu').innerHTML = any ? html : `<div class="empty-search"><b>Nothing matches "${esc(filter)}"</b>Try another word, or clear the search to see everything.</div>`;
+  watchSections();
+}
+function renderNav() {
+  document.getElementById('rail').innerHTML = '<h3>Menu</h3>' + MENU.map(c => `<button type="button" data-go="${c.id}">${esc(c.t)}<span>${c.items.length}</span></button>`).join('');
+  document.getElementById('chips').innerHTML = MENU.map(c => `<button type="button" class="chip" data-go="${c.id}">${esc(c.t)}</button>`).join('');
+}
+let io;
+function watchSections() {
+  if (io) io.disconnect();
+  io = new IntersectionObserver(es => {
+    es.forEach(en => { if (en.isIntersecting) setActive(en.target.dataset.cat); });
+  }, { rootMargin: '-140px 0px -65% 0px' });
+  document.querySelectorAll('section.cat').forEach(s => io.observe(s));
+}
+function setActive(id) {
+  document.querySelectorAll('[data-go]').forEach(b => b.classList.toggle('on', b.dataset.go === id));
+  const chip = document.querySelector(`.chip[data-go="${id}"]`);
+  if (chip) chip.parentElement.scrollTo({ left: chip.offsetLeft - 20, behavior: 'smooth' });
+}
+
+/* ---------- Order body: used by the desktop panel and the drawer ---------- */
+function orderHTML() {
+  if (!cart.length) return `<div class="order"><h3>Your order</h3>
+    <div class="none"><div class="cup">P</div>Nothing here yet.<br>Tap <b>+</b> on anything you fancy.</div></div>`;
+  return `<div class="order">
+    <h3>Your order</h3>
+    <p class="sub">${AT_TABLE ? 'For table ' + TABLE : 'Delivery or self pickup, you choose at checkout'}</p>
+    ${cart.map((l, i) => `<div class="line">
+      <button class="n edit" type="button" data-edit="${esc(l.key)}" aria-label="Change ${esc(ITEMS[l.id].n)}">${esc(ITEMS[l.id].n)}</button><span class="lp">${aed(l.qty * l.unit)}</span>
+      <span class="x">${esc(optsText(l) || (hasOptions(ITEMS[l.id]) ? 'No extras' : aed(l.unit) + ' each'))}${hasOptions(ITEMS[l.id]) ? ` · <button class="change" type="button" data-edit="${esc(l.key)}">Change</button>` : ''}</span>
+      <span class="step"><button type="button" class="bin" data-del="${i}" aria-label="Remove ${esc(ITEMS[l.id].n)}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button><button type="button" data-dec="${i}" aria-label="One less">−</button><output>${l.qty}</output><button type="button" data-inc="${i}" aria-label="One more">+</button></span>
+    </div>`).join('')}
+    <div class="totals"><span>Total</span><span>${aed(total())}</span></div>
+    ${AT_TABLE ? `<p class="note">Prices as on the menu. You pay at the counter.</p>
+    <label class="field"><span>Note for the kitchen · optional</span><textarea id="noteIn" rows="2" maxlength="140" placeholder="Less sugar, no ice, nut allergy…"></textarea></label>
+    <button class="place" type="button" id="placeBtn"><span>Place order</span><span>${aed(total())}</span></button>`
+    : `<p class="note">Delivery to nearby areas, or pick it up yourself at Orchid Residence.</p>
+    <button class="place" type="button" id="checkoutBtn"><span>Checkout</span><span>${aed(total())}</span></button>`}
+  </div>`;
+}
+function bindOrder(root) {
+  root.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => { const l = cart[+b.dataset.inc]; l.qty++; changed(l.id); });
+  root.querySelectorAll('[data-dec]').forEach(b => b.onclick = () => { const i = +b.dataset.dec, l = cart[i]; l.qty--; if (l.qty <= 0) cart.splice(i, 1); changed(l.id); });
+  root.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { const l = cart[+b.dataset.del]; const n = ITEMS[l.id].n; removeLine(l.key); toast(`Removed ${n}`); });
+  root.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => {
+    const l = cart.find(x => x.key === b.dataset.edit); if (!l) return;
+    const fromDrawer = !!root.closest('.drawer');
+    itemDialog(l.id, l.key, fromDrawer);
+  });
+  const co = root.querySelector('#checkoutBtn'); if (co) co.onclick = () => { closeLayer(); showCheckout(); };
+  const btn = root.querySelector('#placeBtn'); if (!btn) return;
+  btn.onclick = () => place({ mode: 'table', note: root.querySelector('#noteIn').value.trim() }, btn);
+}
+function paintOrder() {
+  const panel = document.getElementById('panel');
+  const keepNote = document.getElementById('noteIn') ? document.getElementById('noteIn').value : '';
+  panel.innerHTML = orderHTML(); bindOrder(panel);
+  const drawer = document.querySelector('.drawer');
+  if (drawer) { if (!cart.length) closeLayer(); else { drawer.innerHTML = `<button class="x-close" type="button" data-close aria-label="Close">×</button>` + orderHTML(); bindOrder(drawer); } }
+  const n = document.getElementById('noteIn'); if (n && keepNote) n.value = keepNote;
+  document.getElementById('bar').hidden = !cart.length || isDesk() || inCheckout;
+  document.body.classList.toggle('has-bar', cart.length > 0 && !inCheckout);
+  if (inCheckout) {
+    if (!cart.length) { inCheckout = false; backToMenu(); }
+    else {
+      const cl = document.getElementById('coLines'), cp = document.getElementById('coPlace');
+      if (cl) cl.innerHTML = cart.map(l => `<div class="line"><span class="n">${l.qty} × ${esc(ITEMS[l.id].n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
+        <span class="x">${esc([l.size, ...l.extras].filter(Boolean).join(' · ') || ' ')}</span></div>`).join('') + `<div class="totals"><span>Total</span><span>${aed(total())}</span></div>`;
+      if (cp && !cp.disabled) cp.lastElementChild.textContent = aed(total());
+    }
+  }
+  document.getElementById('barCount').textContent = count();
+  document.getElementById('barTotal').textContent = aed(total());
+}
+
+/* ---------- Layer ---------- */
+const layer = document.getElementById('layer');
+let lastFocus = null;
+function openLayer(html, cls) {
+  lastFocus = document.activeElement;
+  layer.innerHTML = cls === 'drawer'
+    ? `<div class="scrim" data-scrim></div><div class="drawer" role="dialog" aria-modal="true" aria-label="Your order">${html}</div>`
+    : `<div class="scrim" data-scrim><div class="dialog ${cls || ''}" role="dialog" aria-modal="true" style="position:relative">${html}</div></div>`;
+  document.body.style.overflow = 'hidden';
+  const f = layer.querySelector('button, input, select'); if (f) f.focus({ preventScroll: true });
+}
+function closeLayer() { layer.innerHTML = ''; document.body.style.overflow = ''; if (lastFocus) lastFocus.focus({ preventScroll: true }); }
+layer.addEventListener('click', e => { if (e.target.hasAttribute('data-scrim') || e.target.closest('[data-close]')) closeLayer(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && layer.innerHTML) closeLayer();
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.card')) { e.preventDefault(); itemDialog(e.target.dataset.open); }
+});
+
+const hasOptions = it => !!(it.sizes || it.extras);
+/* mode: a line key to edit it, 'new' to add a fresh one, or 'auto' (edit the first one already in the order, else new).
+   back: reopen the order drawer afterwards, when the guest came from there. */
+function itemDialog(id, mode = 'auto', back = false) {
+  const it = ITEMS[id];
+  const lines = () => cart.filter(l => l.id === id);
+  let editKey = mode === 'new' ? null : mode === 'auto' ? (lines()[0] ? lines()[0].key : null) : mode;
+  let qty = 1;
+  openLayer(`<button class="x-close" type="button" data-close aria-label="Close">×</button>
+    <div class="hero">${PHOTOS[id] ? `<img src="${PHOTOS[id]}" alt="">` : `<span class="mono">${mono(it.short)}</span>`}</div>
+    <div class="info">
+      <div style="font:600 .68rem var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft)">${esc(it.cat.t)}</div>
+      <h3>${esc(it.n)}</h3>
+      ${it.d ? `<p class="desc">${esc(it.d)}</p>` : ''}
+      <div id="inOrder"></div>
+      ${it.sizes ? `<fieldset><legend>Choose your size</legend><div class="opts">${it.sizes.map((s, i) => `
+        <label class="opt"><span><input type="radio" name="size" id="size-${i}" value="${i}" ${i ? '' : 'checked'}>${esc(s.n)}</span><span class="p">${aed(s.p)}</span></label>`).join('')}</div></fieldset>` : ''}
+      ${it.extras ? `<fieldset><legend>Make it yours · optional</legend><div class="opts">${EXTRAS.map((x, i) => `
+        <label class="opt"><span><input type="checkbox" name="extra" id="extra-${i}" value="${i}">${esc(x.n)}</span><span class="p">+${x.p}</span></label>`).join('')}</div></fieldset>` : ''}
+      <div class="addrow">
+        <div class="qty"><button type="button" id="minus" aria-label="One less">−</button><output id="qty">1</output><button type="button" id="plus" aria-label="One more">+</button></div>
+        <button class="addbtn" type="button" id="addBtn"><span id="addLabel">Add to order</span><span id="addPrice"></span></button>
+      </div>
+      <button class="remove" type="button" id="removeBtn" hidden><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Remove from order</button>
+    </div>`);
+  const d = layer.querySelector('.dialog');
+  const sizeIdx = () => it.sizes ? +d.querySelector('input[name=size]:checked').value : -1;
+  const unit = () => (it.sizes ? it.sizes[sizeIdx()].p : it.p) + [...d.querySelectorAll('input[name=extra]:checked')].reduce((a, c) => a + EXTRAS[+c.value].p, 0);
+  // fill the form from a line (edit) or reset it (new)
+  function load(key) {
+    editKey = key;
+    const l = key ? cart.find(x => x.key === key) : null;
+    if (it.sizes) { const si = l ? Math.max(0, it.sizes.findIndex(s => s.n === l.size)) : 0; d.querySelector('#size-' + si).checked = true; }
+    d.querySelectorAll('input[name=extra]').forEach(c => { c.checked = !!(l && l.extras.includes(EXTRAS[+c.value].n)); });
+    qty = l ? l.qty : 1;
+    paintList(); paint();
+  }
+  function paintList() {
+    const ls = lines(), box = d.querySelector('#inOrder');
+    if (!ls.length) { box.innerHTML = ''; return; }
+    box.innerHTML = `<div class="inorder"><div class="io-h">In your order</div>
+      ${ls.map(l => `<button type="button" class="io ${l.key === editKey ? 'on' : ''}" data-pick="${esc(l.key)}">
+        <span>${l.qty} × ${esc(optsText(l) || (hasOptions(it) ? 'No extras' : it.short))}</span><span>${aed(l.qty * l.unit)}</span></button>`).join('')}
+      ${hasOptions(it) ? `<button type="button" class="io add ${editKey ? '' : 'on'}" data-pick="">+ Add another, made differently</button>` : ''}</div>`;
+    box.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => load(b.dataset.pick || null));
+  }
+  function paint() {
+    d.querySelector('#qty').textContent = qty;
+    d.querySelector('#addPrice').textContent = aed(unit() * qty);
+    d.querySelector('#addLabel').textContent = editKey ? 'Update order' : 'Add to order';
+    d.querySelector('#removeBtn').hidden = !editKey;
+  }
+  const finish = () => { closeLayer(); if (back && cart.length && !isDesk()) orderDrawer(); };
+  d.addEventListener('change', paint);
+  d.querySelector('#minus').onclick = () => { qty = Math.max(1, qty - 1); paint(); };
+  d.querySelector('#plus').onclick = () => { qty = Math.min(20, qty + 1); paint(); };
+  d.querySelector('#addBtn').onclick = () => {
+    const size = it.sizes ? it.sizes[sizeIdx()].n : null;
+    const extras = [...d.querySelectorAll('input[name=extra]:checked')].map(c => EXTRAS[+c.value].n);
+    if (editKey) { updateLine(editKey, size, extras, qty, unit()); finish(); toast(`Updated ${it.n}`); }
+    else { addLine(id, size, extras, qty, unit()); finish(); toast(`Added ${qty > 1 ? qty + ' × ' : ''}${it.n}`); }
+  };
+  d.querySelector('#removeBtn').onclick = () => { removeLine(editKey); finish(); toast(`Removed ${it.n}`); };
+  d.querySelector('[data-close]').addEventListener('click', () => { if (back && cart.length && !isDesk()) setTimeout(orderDrawer, 0); });
+  load(editKey);
+}
+function orderDrawer() { openLayer(`<button class="x-close" type="button" data-close aria-label="Close">×</button>` + orderHTML(), 'drawer'); bindOrder(layer.querySelector('.drawer')); }
+
+let tt;
+function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => t.classList.remove('show'), 1800); }
+
+/* ---------- Place order: sent to the staff screen ---------- */
+let lastOrder = null;
+let placing = false;
+async function place(info, btn) {
+  if (placing) return;          // a double tap must never send the order twice
+  placing = true;
+  const lines = cart.map(l => ({ n: ITEMS[l.id].n, qty: l.qty, unit: l.unit, opts: [l.size, ...l.extras].filter(Boolean).join(' · ') }));
+  const sum = total(), ref = String(Math.floor(100 + Math.random() * 900));
+  const order = Object.assign({ id: ref + '-' + Date.now().toString(36), ref, table: AT_TABLE ? TABLE : null, lines, total: sum }, info);
+  const label = btn.firstElementChild.textContent;
+  btn.disabled = true; btn.firstElementChild.innerHTML = '<span class="spin" aria-hidden="true"></span>Sending…';
+  try { await PoffiesLive.order(order); }
+  catch (e) { placing = false; btn.disabled = false; btn.firstElementChild.textContent = label; toast(AT_TABLE ? "Couldn't send your order. Try again, or tell a waiter." : "Couldn't send your order. Check your internet and try again."); return; }
+  placing = false; cart = []; closeLayer(); lastOrder = order; inCheckout = false; coDraft = null; document.body.classList.remove('co-mode');
+  if (AT_TABLE) { hasOrdered = true; try { sessionStorage.setItem(ORDERED_KEY, '1'); } catch (e) {} }
+  paintWhere(); paintOrder();
+  document.getElementById('tools').hidden = true;
+  if (AT_TABLE) showGames(order); else showHomeDone(order);
+}
+const receiptHTML = o => `${o.lines.map(l => `<div class="line"><span class="n">${l.qty} × ${esc(l.n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
+  <span class="x">${esc(l.opts || ' ')}</span></div>`).join('')}${o.note ? `<p class="note" style="margin-top:10px">Note: ${esc(o.note)}</p>` : ''}
+  <div class="totals"><span>Total</span><span>${aed(o.total)}</span></div>`;
+function backToMenu() { document.body.classList.remove('co-mode'); document.getElementById('tools').hidden = false; renderMenu(''); window.scrollTo(0, 0); }
+
+function showHomeDone(o) {
+  const d = o.mode === 'delivery';
+  document.getElementById('menu').innerHTML = `<div class="done">
+    <ol class="steps3" aria-label="Progress" style="justify-content:center;margin-bottom:8px"><li class="ok"><b>✓</b><span>Your food</span></li><i></i><li class="ok"><b>✓</b><span>Your details</span></li><i></i><li class="ok"><b>✓</b><span>Done</span></li></ol>
+    <div class="tick">✓</div>
+    <div class="ref">Order ${o.ref} · ${d ? 'Delivery' : 'Self pickup'}</div>
+    <h2>Order received</h2>
+    <p class="lead">${d ? `We'll call you on ${esc(o.phone)} to confirm, then bring it to ${esc(o.address.area)}.`
+      : `We'll get it ready. Collect it at the counter at Orchid Residence, under the name ${esc(o.name)}. If anything changes we'll call ${esc(o.phone)}.`}</p>
+    <div class="receipt">${receiptHTML(o)}</div>
+    ${d ? `<div class="receipt" style="margin-top:12px;padding:14px 18px"><b>Delivering to</b><br>${esc(o.name)} · ${esc(o.phone)}<br>${esc([o.address.building, o.address.flat && 'Flat ' + o.address.flat, o.address.street, o.address.area].filter(Boolean).join(', '))}${o.address.notes ? `<br><span class="note">${esc(o.address.notes)}</span>` : ''}</div>` : ''}
+    <button class="again" type="button" onclick="backToMenu()">Back to the menu</button></div>`;
+  window.scrollTo(0, 0);
+}
+
+/* ---------- Checkout for home orders: delivery to an address, or self pickup ---------- */
+let inCheckout = false, coLoc = null, coDraft = null;   // coDraft: what the guest typed, kept while they go back to the menu
+const CO_KEY = 'poffies-checkout';
+function savedCheckout() { try { return JSON.parse(localStorage.getItem(CO_KEY) || '{}'); } catch (e) { return {}; } }
+function showCheckout() {
+  if (!cart.length) return;
+  inCheckout = true;
+  document.body.classList.add('co-mode');
+  const sv = Object.assign({}, savedCheckout(), coDraft || {});
+  const mode = sv.mode === 'pickup' ? 'pickup' : 'delivery';
+  document.getElementById('tools').hidden = true;
+  document.getElementById('bar').hidden = true; document.body.classList.remove('has-bar');
+  document.getElementById('menu').innerHTML = `
+    <div class="co-top">
+      <button class="co-back" type="button" id="coBack" style="padding:0">← Edit order</button>
+      <ol class="steps3" aria-label="Progress"><li class="ok"><b>✓</b><span>Your food</span></li><i></i><li class="now"><b>2</b><span>Your details</span></li><i></i><li><b>3</b><span>Done</span></li></ol>
+    </div>
+    <form class="checkout" id="coForm" novalidate>
+      <div class="co-card">
+        <h2>Checkout</h2>
+        <p class="hint">How would you like to get your order?</p>
+        <div class="seg">
+          <label><input type="radio" name="mode" id="mode-delivery" value="delivery" ${mode === 'delivery' ? 'checked' : ''}><b>Delivery</b><span>To nearby areas</span></label>
+          <label><input type="radio" name="mode" id="mode-pickup" value="pickup" ${mode === 'pickup' ? 'checked' : ''}><b>Self pickup</b><span>At Orchid Residence</span></label>
+        </div>
+        <div class="row2">
+          <label class="field"><span>Your name</span><input id="coName" name="name" type="text" autocomplete="name" maxlength="40" value="${esc(sv.name || '')}"></label>
+          <label class="field"><span>Mobile number</span><input id="coPhone" name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="05X XXX XXXX" value="${esc(sv.phone || '')}"></label>
+        </div>
+        <div id="coAddr">
+          <label class="field"><span>Area</span><input id="coArea" type="text" autocomplete="address-level2" maxlength="60" placeholder="e.g. Dubai Science Park" value="${esc(sv.area || '')}"></label>
+          <div class="row2">
+            <label class="field"><span>Building or villa</span><input id="coBuilding" type="text" autocomplete="address-line1" maxlength="60" value="${esc(sv.building || '')}"></label>
+            <label class="field"><span>Flat · optional</span><input id="coFlat" type="text" maxlength="20" value="${esc(sv.flat || '')}"></label>
+          </div>
+          <label class="field"><span>Street · optional</span><input id="coStreet" type="text" autocomplete="address-line2" maxlength="80" value="${esc(sv.street || '')}"></label>
+          <label class="field"><span>Directions for the driver · optional</span><textarea id="coNotes" rows="2" maxlength="160" placeholder="Gate code, landmark, call on arrival…">${esc(sv.notes || '')}</textarea></label>
+          <button class="locbtn" type="button" id="coLocBtn">Add my exact location (helps the driver)</button>
+        </div>
+        <div id="coPick" class="pickup-note" style="margin-top:12px">Collect at the counter at Orchid Residence, Dubai Science Park. We'll have it ready under your name.</div>
+        <label class="field"><span>Note for the kitchen · optional</span><textarea id="coKitchen" rows="2" maxlength="140" placeholder="Less sugar, no ice, nut allergy…">${esc(sv.kitchen || '')}</textarea></label>
+      </div>
+      <div class="co-card co-sum">
+        <h2>Your order</h2>
+        <div id="coLines"></div>
+        <p class="note" id="coPayNote"></p>
+        <button class="place" type="submit" id="coPlace"><span>Place order</span><span>${aed(total())}</span></button>
+        <button class="again" type="button" id="coEdit" style="width:100%;margin-top:10px">Edit order</button>
+      </div>
+    </form>`;
+  document.getElementById('coLines').innerHTML = cart.map(l => `<div class="line"><span class="n">${l.qty} × ${esc(ITEMS[l.id].n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
+    <span class="x">${esc([l.size, ...l.extras].filter(Boolean).join(' · ') || ' ')}</span></div>`).join('') + `<div class="totals"><span>Total</span><span>${aed(total())}</span></div>`;
+  const f = document.getElementById('coForm');
+  const sync = () => {
+    const del = f.querySelector('input[name=mode]:checked').value === 'delivery';
+    document.getElementById('coAddr').hidden = !del;
+    document.getElementById('coPick').hidden = del;
+    document.getElementById('coPayNote').textContent = del ? 'We call you to confirm your order and delivery time before we send it.' : 'You pay at the counter when you collect.';
+  };
+  f.addEventListener('change', sync); sync();
+  const grab = () => { const v = id => document.getElementById(id).value; coDraft = { mode: f.querySelector('input[name=mode]:checked').value, name: v('coName'), phone: v('coPhone'), area: v('coArea'), building: v('coBuilding'), flat: v('coFlat'), street: v('coStreet'), notes: v('coNotes'), kitchen: v('coKitchen') }; };
+  f.addEventListener('input', grab); f.addEventListener('change', grab);
+  const leave = () => { grab(); inCheckout = false; backToMenu(); paintOrder(); };
+  document.getElementById('coBack').onclick = leave;
+  document.getElementById('coEdit').onclick = leave;
+  const lb = document.getElementById('coLocBtn');
+  if (coLoc) { lb.classList.add('ok'); lb.textContent = 'Exact location added ✓'; }
+  lb.onclick = () => {
+    if (!navigator.geolocation) { toast('Location is not available on this device.'); return; }
+    lb.textContent = 'Finding you…';
+    navigator.geolocation.getCurrentPosition(p => { coLoc = { lat: +p.coords.latitude.toFixed(5), lng: +p.coords.longitude.toFixed(5) }; lb.classList.add('ok'); lb.textContent = 'Exact location added ✓'; },
+      () => { lb.textContent = 'Add my exact location (helps the driver)'; toast("Couldn't get your location. The address is enough."); }, { enableHighAccuracy: true, timeout: 10000 });
+  };
+  f.addEventListener('submit', e => {
+    e.preventDefault();
+    const v = id => document.getElementById(id).value.trim();
+    const del = f.querySelector('input[name=mode]:checked').value === 'delivery';
+    f.querySelectorAll('.err').forEach(x => x.remove());
+    const bad = [];
+    const need = (id, msg) => { if (!v(id)) bad.push([id, msg]); };
+    need('coName', 'Please add your name');
+    if (v('coPhone').replace(/\D/g, '').length < 9) bad.push(['coPhone', 'Please add a mobile number we can call']);
+    if (del) { need('coArea', 'Which area should we deliver to?'); need('coBuilding', 'Please add the building or villa'); }
+    if (bad.length) {
+      bad.forEach(([id, msg]) => document.getElementById(id).insertAdjacentHTML('afterend', `<span class="err">${msg}</span>`));
+      document.getElementById(bad[0][0]).focus(); return;
+    }
+    const details = { mode: del ? 'delivery' : 'pickup', name: v('coName'), phone: v('coPhone'), area: v('coArea'), building: v('coBuilding'), flat: v('coFlat'), street: v('coStreet'), notes: v('coNotes') };
+    try { localStorage.setItem(CO_KEY, JSON.stringify(details)); } catch (err) {}   // remembered on this phone for next time
+    place({ mode: details.mode, name: details.name, phone: details.phone, note: v('coKitchen'),
+      address: del ? { area: details.area, building: details.building, flat: details.flat, street: details.street, notes: details.notes, loc: coLoc } : null }, document.getElementById('coPlace'));
+  });
+  window.scrollTo(0, 0);
+}
+
+/* Games come first after a table order: the guest sees them without scrolling. */
+let gamesOpen = false, pendingGame = null;
+function showGames(o) {
+  gamesOpen = true;
+  document.getElementById('tools').hidden = true;
+  document.getElementById('menu').innerHTML = `
+    ${o ? `<div class="done compact">
+      <div class="tick">✓</div>
+      <h2>Order ${o.ref} received</h2>
+      <p class="lead">Table ${TABLE} · we're making it now. Pay at the counter when you're ready.</p>
+      <details><summary>See your order · ${o.lines.reduce((a, l) => a + l.qty, 0)} items · ${aed(o.total)}</summary><div class="receipt" style="margin-top:8px">${receiptHTML(o)}</div></details>
+    </div>` : ''}
+    <section class="games" id="gamesBox"></section>
+    <button class="again" type="button" onclick="gamesOpen=false;backToMenu()">Back to the menu</button>`;
+  paintGames(); window.scrollTo(0, 0);
+}
+function paintGames() {
+  const box = document.getElementById('gamesBox'); if (!gamesOpen || !box) return;
+  const L = PoffiesLive, st = L.state, mine = L.tableGame(TABLE);
+  const free = L.GAMES.filter(g => st.games[g.id].status === 'shelf');
+  const out = L.GAMES.length - free.length - (mine ? 1 : 0);
+  let banner = '';
+  if (mine) {
+    const g = L.gameById(mine.id);
+    banner = `<div class="mygame"><div class="box" style="background:${g.c}">${L.art(g)}</div><div><b>${esc(g.n)}</b>
+      <span>${mine.status === 'requested' ? 'On its way to your table. A waiter has been told.' : "Enjoy! We'll collect it when your food arrives."}</span></div></div>`;
+  }
+  box.innerHTML = `<div class="games-head"><div><h2>Play while you wait</h2>
+      <p class="sub2">${mine ? 'One game per table at a time. Want another? Ask us to swap.' : "Pick a board game and we'll bring it to your table. It's free."}</p></div>
+      <span class="live ${L.connected ? '' : 'off'}"><i></i>${L.connected ? 'Live shelf' : 'Reconnecting'}</span></div>
+    ${banner}
+    ${free.length ? `<div class="shelf">${free.map(g => `<button class="game" type="button" data-game="${g.id}" ${mine ? 'disabled' : ''}>
+      <div class="box" style="background:${g.c}">${L.art(g)}</div>
+      <div class="gi"><div class="gn">${esc(g.n)}</div><div class="gm">${esc(g.p)} · ${esc(g.m)}</div>${mine ? '' : '<div class="ask">Bring to my table →</div>'}</div></button>`).join('')}</div>`
+      : `<p class="away">Every game is out at a table right now. Check back in a few minutes.</p>`}
+    ${out > 0 ? `<p class="away">${out} more ${out === 1 ? 'game is' : 'games are'} out at other tables and will show here once they're back on the shelf.</p>` : ''}`;
+  // a request we sent: did we get it, or did someone beat us to it?
+  if (pendingGame) {
+    const g = st.games[pendingGame];
+    if (g.table === TABLE) { pendingGame = null; }
+    else if (g.status !== 'shelf') { toast('Someone just took that one. Pick another.'); pendingGame = null; }
+  }
+}
+function askGame(id) {
+  const g = PoffiesLive.gameById(id);
+  openLayer(`<div class="gconfirm"><div class="box" style="background:${g.c}">${PoffiesLive.art(g)}</div>
+    <h3>${esc(g.n)}</h3><p>${esc(g.p)} · ${esc(g.m)}<br>We'll bring it to table ${TABLE}.</p>
+    <div class="row"><button class="again" style="margin:0" type="button" data-close>Not now</button><button class="addbtn" type="button" id="bring" style="justify-content:center">Yes, bring it</button></div></div>`, 'small');
+  document.getElementById('bring').onclick = async e => {
+    e.target.disabled = true; e.target.innerHTML = '<span class="spin" aria-hidden="true"></span>Telling the waiter…';
+    pendingGame = id;
+    try { await PoffiesLive.requestGame(id, TABLE, lastOrder ? lastOrder.ref : ''); closeLayer(); toast(`${g.n} is on its way`); }
+    catch (err) { pendingGame = null; e.target.disabled = false; e.target.textContent = 'Yes, bring it'; toast("Couldn't reach the staff. Please ask a waiter."); }
+  };
+}
+
+/* ---------- Events ---------- */
+document.addEventListener('click', e => {
+  const quick = e.target.closest('[data-quick]');
+  if (quick) {
+    const it = ITEMS[quick.dataset.quick];
+    if (hasOptions(it)) itemDialog(it.id, 'new');   // there is something to choose, so ask first
+    else { addLine(it.id, null, [], 1, it.p); toast(`Added ${it.n}`); }
+    return;
+  }
+  const gm = e.target.closest('[data-game]'); if (gm) return askGame(gm.dataset.game);
+  const open = e.target.closest('[data-open]'); if (open) return itemDialog(open.dataset.open);
+  const go = e.target.closest('[data-go]');
+  if (go) {
+    const sec = document.getElementById('cat-' + go.dataset.go);
+    if (sec) { window.scrollTo({ top: sec.getBoundingClientRect().top + scrollY - (isDesk() ? 20 : 120), behavior: 'smooth' }); setActive(go.dataset.go); }
+  }
+});
+document.getElementById('openOrder').onclick = orderDrawer;
+const q = document.getElementById('q'), qc = document.getElementById('qClear');
+q.addEventListener('input', () => { qc.hidden = !q.value; renderMenu(q.value); });
+qc.onclick = () => { q.value = ''; qc.hidden = true; renderMenu(''); q.focus(); };
+/* The phone keyboard opening fires "resize". Redrawing then would throw away the field being typed in,
+   so only react when the layout really switches between laptop and phone/tablet. */
+let wasDesk = isDesk();
+addEventListener('resize', () => {
+  const d = isDesk(); if (d === wasDesk) return; wasDesk = d;
+  if (d && document.querySelector('.drawer')) closeLayer();
+  const typing = document.activeElement && document.activeElement.matches('input, textarea, select');
+  if (!typing) paintOrder();
+});
+
+document.getElementById('gamesBtn').onclick = () => showGames(null);
+renderNav(); renderMenu(''); paintOrder();
+if (AT_TABLE) { PoffiesLive.on(paintGames); PoffiesLive.connect(); }
+</script>
+</body>
+</html>
