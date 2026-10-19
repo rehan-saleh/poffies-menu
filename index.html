@@ -247,6 +247,18 @@ legend { font: 600 .68rem var(--sans); letter-spacing: .2em; text-transform: upp
 .co-sum .line .step { display: none; }
 .spin { display: inline-block; width: 15px; height: 15px; border: 2.5px solid currentColor; border-right-color: transparent; border-radius: 50%; vertical-align: -3px; margin-right: 8px; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+.inorder { margin-top: 14px; border: 1.5px solid var(--line); border-radius: 14px; padding: 10px; display: grid; gap: 6px; background: var(--bg); }
+.io-h { font: 600 .66rem var(--sans); letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); padding: 0 4px 2px; }
+.io { display: flex; justify-content: space-between; gap: 10px; text-align: left; border: 1.5px solid transparent; background: var(--surface); border-radius: 10px; padding: 9px 10px; font: 500 .88rem var(--sans); cursor: pointer; }
+.io.on { border-color: var(--accent); }
+.io.add { justify-content: center; color: var(--accent); font-weight: 600; background: transparent; border-style: dashed; border-color: var(--line); }
+.io.add.on { border-style: solid; border-color: var(--accent); }
+.remove { margin-top: 12px; align-self: center; display: inline-flex; align-items: center; gap: 8px; border: 0; background: none; color: #b2442f; font: 600 .88rem var(--sans); cursor: pointer; padding: 8px 10px; border-radius: 10px; }
+.remove:hover { background: #fbe9e5; }
+.line .edit { border: 0; background: none; padding: 0; text-align: left; cursor: pointer; color: inherit; }
+.line .edit:hover { text-decoration: underline; }
+.line .change { border: 0; background: none; padding: 0; color: var(--accent); font: 600 .8rem var(--sans); cursor: pointer; text-decoration: underline; }
+.step .bin { color: #b2442f; display: grid; place-items: center; margin-right: 4px; }
 .games-btn { border: 0; background: rgba(255,255,255,.88); color: #4c2350; border-radius: 999px; padding: 8px 14px; font: 600 .78rem var(--sans); letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
 .again { margin-top: 26px; border: 1.5px solid var(--line); background: transparent; border-radius: 14px; padding: 13px 20px; cursor: pointer; font-weight: 500; }
 
@@ -381,11 +393,26 @@ let cart = []; // { key, id, size, extras, qty, unit }
 const count = () => cart.reduce((a, l) => a + l.qty, 0);
 const total = () => cart.reduce((a, l) => a + l.qty * l.unit, 0);
 const qtyOf = id => cart.filter(l => l.id === id).reduce((a, l) => a + l.qty, 0);
+const keyOf = (id, size, extras) => [id, size, extras.join('|')].join('#');
+const optsText = l => [l.size, ...l.extras].filter(Boolean).join(' · ');
 function addLine(id, size, extras, qty, unit) {
-  const key = [id, size, extras.join('|')].join('#');
+  const key = keyOf(id, size, extras);
   const l = cart.find(x => x.key === key);
   if (l) l.qty += qty; else cart.push({ key, id, size, extras, qty, unit });
   changed(id);
+}
+/* Edit an existing line in place. If the new choices match another line of the same item, merge them. */
+function updateLine(oldKey, size, extras, qty, unit) {
+  const i = cart.findIndex(x => x.key === oldKey); if (i < 0) return;
+  const id = cart[i].id, key = keyOf(id, size, extras);
+  const twin = cart.find(x => x.key === key && x.key !== oldKey);
+  if (twin) { twin.qty += qty; cart.splice(i, 1); }
+  else Object.assign(cart[i], { key, size, extras, qty, unit });
+  changed(id);
+}
+function removeLine(key) {
+  const i = cart.findIndex(x => x.key === key); if (i < 0) return;
+  const id = cart[i].id; cart.splice(i, 1); changed(id);
 }
 function changed(id) { if (id) refreshCard(id); paintOrder(); }
 
@@ -444,9 +471,9 @@ function orderHTML() {
     <h3>Your order</h3>
     <p class="sub">${AT_TABLE ? 'For table ' + TABLE : 'Delivery or self pickup, you choose at checkout'}</p>
     ${cart.map((l, i) => `<div class="line">
-      <span class="n">${esc(ITEMS[l.id].n)}</span><span class="lp">${aed(l.qty * l.unit)}</span>
-      <span class="x">${esc([l.size, ...l.extras].filter(Boolean).join(' · ') || aed(l.unit) + ' each')}</span>
-      <span class="step"><button type="button" data-dec="${i}" aria-label="One less">−</button><output>${l.qty}</output><button type="button" data-inc="${i}" aria-label="One more">+</button></span>
+      <button class="n edit" type="button" data-edit="${esc(l.key)}" aria-label="Change ${esc(ITEMS[l.id].n)}">${esc(ITEMS[l.id].n)}</button><span class="lp">${aed(l.qty * l.unit)}</span>
+      <span class="x">${esc(optsText(l) || aed(l.unit) + ' each')}${hasOptions(ITEMS[l.id]) ? ` · <button class="change" type="button" data-edit="${esc(l.key)}">Change</button>` : ''}</span>
+      <span class="step"><button type="button" class="bin" data-del="${i}" aria-label="Remove ${esc(ITEMS[l.id].n)}"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button><button type="button" data-dec="${i}" aria-label="One less">−</button><output>${l.qty}</output><button type="button" data-inc="${i}" aria-label="One more">+</button></span>
     </div>`).join('')}
     <div class="totals"><span>Total</span><span>${aed(total())}</span></div>
     ${AT_TABLE ? `<p class="note">Prices as on the menu. You pay at the counter.</p>
@@ -459,6 +486,12 @@ function orderHTML() {
 function bindOrder(root) {
   root.querySelectorAll('[data-inc]').forEach(b => b.onclick = () => { const l = cart[+b.dataset.inc]; l.qty++; changed(l.id); });
   root.querySelectorAll('[data-dec]').forEach(b => b.onclick = () => { const i = +b.dataset.dec, l = cart[i]; l.qty--; if (l.qty <= 0) cart.splice(i, 1); changed(l.id); });
+  root.querySelectorAll('[data-del]').forEach(b => b.onclick = () => { const l = cart[+b.dataset.del]; const n = ITEMS[l.id].n; removeLine(l.key); toast(`Removed ${n}`); });
+  root.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => {
+    const l = cart.find(x => x.key === b.dataset.edit); if (!l) return;
+    const fromDrawer = !!root.closest('.drawer');
+    itemDialog(l.id, l.key, fromDrawer);
+  });
   const co = root.querySelector('#checkoutBtn'); if (co) co.onclick = () => { closeLayer(); showCheckout(); };
   const btn = root.querySelector('#placeBtn'); if (!btn) return;
   btn.onclick = () => place({ mode: 'table', note: root.querySelector('#noteIn').value.trim() }, btn);
@@ -503,36 +536,71 @@ document.addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('.card')) { e.preventDefault(); itemDialog(e.target.dataset.open); }
 });
 
-function itemDialog(id) {
-  const it = ITEMS[id]; let qty = 1;
+const hasOptions = it => !!(it.sizes || it.extras);
+/* mode: a line key to edit it, 'new' to add a fresh one, or 'auto' (edit the first one already in the order, else new).
+   back: reopen the order drawer afterwards, when the guest came from there. */
+function itemDialog(id, mode = 'auto', back = false) {
+  const it = ITEMS[id];
+  const lines = () => cart.filter(l => l.id === id);
+  let editKey = mode === 'new' ? null : mode === 'auto' ? (lines()[0] ? lines()[0].key : null) : mode;
+  let qty = 1;
   openLayer(`<button class="x-close" type="button" data-close aria-label="Close">×</button>
     <div class="hero">${PHOTOS[id] ? `<img src="${PHOTOS[id]}" alt="">` : `<span class="mono">${mono(it.short)}</span>`}</div>
     <div class="info">
       <div style="font:600 .68rem var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-soft)">${esc(it.cat.t)}</div>
       <h3>${esc(it.n)}</h3>
       ${it.d ? `<p class="desc">${esc(it.d)}</p>` : ''}
+      <div id="inOrder"></div>
       ${it.sizes ? `<fieldset><legend>Choose your size</legend><div class="opts">${it.sizes.map((s, i) => `
         <label class="opt"><span><input type="radio" name="size" id="size-${i}" value="${i}" ${i ? '' : 'checked'}>${esc(s.n)}</span><span class="p">${aed(s.p)}</span></label>`).join('')}</div></fieldset>` : ''}
       ${it.extras ? `<fieldset><legend>Make it yours · optional</legend><div class="opts">${EXTRAS.map((x, i) => `
         <label class="opt"><span><input type="checkbox" name="extra" id="extra-${i}" value="${i}">${esc(x.n)}</span><span class="p">+${x.p}</span></label>`).join('')}</div></fieldset>` : ''}
       <div class="addrow">
         <div class="qty"><button type="button" id="minus" aria-label="One less">−</button><output id="qty">1</output><button type="button" id="plus" aria-label="One more">+</button></div>
-        <button class="addbtn" type="button" id="addBtn"><span>Add to order</span><span id="addPrice"></span></button>
+        <button class="addbtn" type="button" id="addBtn"><span id="addLabel">Add to order</span><span id="addPrice"></span></button>
       </div>
+      <button class="remove" type="button" id="removeBtn" hidden><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>Remove from order</button>
     </div>`);
   const d = layer.querySelector('.dialog');
-  const unit = () => (it.sizes ? it.sizes[+d.querySelector('input[name=size]:checked').value].p : it.p)
-    + [...d.querySelectorAll('input[name=extra]:checked')].reduce((a, c) => a + EXTRAS[+c.value].p, 0);
-  const paint = () => { d.querySelector('#qty').textContent = qty; d.querySelector('#addPrice').textContent = aed(unit() * qty); };
+  const sizeIdx = () => it.sizes ? +d.querySelector('input[name=size]:checked').value : -1;
+  const unit = () => (it.sizes ? it.sizes[sizeIdx()].p : it.p) + [...d.querySelectorAll('input[name=extra]:checked')].reduce((a, c) => a + EXTRAS[+c.value].p, 0);
+  // fill the form from a line (edit) or reset it (new)
+  function load(key) {
+    editKey = key;
+    const l = key ? cart.find(x => x.key === key) : null;
+    if (it.sizes) { const si = l ? Math.max(0, it.sizes.findIndex(s => s.n === l.size)) : 0; d.querySelector('#size-' + si).checked = true; }
+    d.querySelectorAll('input[name=extra]').forEach(c => { c.checked = !!(l && l.extras.includes(EXTRAS[+c.value].n)); });
+    qty = l ? l.qty : 1;
+    paintList(); paint();
+  }
+  function paintList() {
+    const ls = lines(), box = d.querySelector('#inOrder');
+    if (!ls.length) { box.innerHTML = ''; return; }
+    box.innerHTML = `<div class="inorder"><div class="io-h">In your order</div>
+      ${ls.map(l => `<button type="button" class="io ${l.key === editKey ? 'on' : ''}" data-pick="${esc(l.key)}">
+        <span>${l.qty} × ${esc(optsText(l) || (hasOptions(it) ? 'No extras' : it.short))}</span><span>${aed(l.qty * l.unit)}</span></button>`).join('')}
+      ${hasOptions(it) ? `<button type="button" class="io add ${editKey ? '' : 'on'}" data-pick="">+ Add another, made differently</button>` : ''}</div>`;
+    box.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => load(b.dataset.pick || null));
+  }
+  function paint() {
+    d.querySelector('#qty').textContent = qty;
+    d.querySelector('#addPrice').textContent = aed(unit() * qty);
+    d.querySelector('#addLabel').textContent = editKey ? 'Update order' : 'Add to order';
+    d.querySelector('#removeBtn').hidden = !editKey;
+  }
+  const finish = () => { closeLayer(); if (back && cart.length && !isDesk()) orderDrawer(); };
   d.addEventListener('change', paint);
   d.querySelector('#minus').onclick = () => { qty = Math.max(1, qty - 1); paint(); };
   d.querySelector('#plus').onclick = () => { qty = Math.min(20, qty + 1); paint(); };
   d.querySelector('#addBtn').onclick = () => {
-    const size = it.sizes ? it.sizes[+d.querySelector('input[name=size]:checked').value].n : null;
+    const size = it.sizes ? it.sizes[sizeIdx()].n : null;
     const extras = [...d.querySelectorAll('input[name=extra]:checked')].map(c => EXTRAS[+c.value].n);
-    addLine(id, size, extras, qty, unit()); closeLayer(); toast(`Added ${qty > 1 ? qty + ' × ' : ''}${it.n}`);
+    if (editKey) { updateLine(editKey, size, extras, qty, unit()); finish(); toast(`Updated ${it.n}`); }
+    else { addLine(id, size, extras, qty, unit()); finish(); toast(`Added ${qty > 1 ? qty + ' × ' : ''}${it.n}`); }
   };
-  paint();
+  d.querySelector('#removeBtn').onclick = () => { removeLine(editKey); finish(); toast(`Removed ${it.n}`); };
+  d.querySelector('[data-close]').addEventListener('click', () => { if (back && cart.length && !isDesk()) setTimeout(orderDrawer, 0); });
+  load(editKey);
 }
 function orderDrawer() { openLayer(`<button class="x-close" type="button" data-close aria-label="Close">×</button>` + orderHTML(), 'drawer'); bindOrder(layer.querySelector('.drawer')); }
 
@@ -727,7 +795,7 @@ document.addEventListener('click', e => {
   const quick = e.target.closest('[data-quick]');
   if (quick) {
     const it = ITEMS[quick.dataset.quick];
-    if (it.sizes || it.extras) itemDialog(it.id); // there is something to choose, so ask first
+    if (hasOptions(it)) itemDialog(it.id, 'new');   // there is something to choose, so ask first
     else { addLine(it.id, null, [], 1, it.p); toast(`Added ${it.n}`); }
     return;
   }
