@@ -9,14 +9,14 @@
 <link rel="icon" href="https://cafepoffiesmenu.canva.link/poffiesdubaimenu/_assets/media/7cc4d0bbe94bf8bdaeb9cad622a82997.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gilda+Display&family=Jost:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Jost:wght@400;500;600&display=swap">
 <style>
 /* Layout: velvet band, then "Do this now" (game requests + collect reminders) beside "Orders"; the full shelf below. One tap per job. */
 :root {
   --bg: #fff6f2; --surface: #ffffff; --plate: #f8e6ea; --ink: #4c2350; --ink-soft: #7b5580; --line: #efdbe1;
   --accent: #4c2350; --accent-ink: #fff6f2; --gold: #c9a04c; --velvet: #eab3be; --velvet-dot: #9c4f63; --velvet-seam: rgba(150, 60, 85, .22);
   --ok: #3f7d4e; --warn: #c9822e; --shadow: rgba(76, 35, 80, .16);
-  --serif: "Gilda Display", Georgia, serif; --sans: "Jost", "Segoe UI", system-ui, sans-serif;
+  --serif: "Fredoka", "Nunito", "Segoe UI", system-ui, sans-serif; --sans: "Jost", "Segoe UI", system-ui, sans-serif;
   --gl: max(16px, env(safe-area-inset-left, 0px)); --gr: max(16px, env(safe-area-inset-right, 0px));
   color-scheme: light;
 }
@@ -44,7 +44,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .wrap { max-width: 1400px; margin: 0 auto; padding: 18px var(--gr) 40px var(--gl); }
 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
 @media (max-width: 900px) { .cols { grid-template-columns: 1fr; } }
-h2 { font: 400 1.5rem var(--serif); text-transform: uppercase; margin: 0 0 10px; display: flex; align-items: center; gap: 10px; }
+h2 { font: 600 1.5rem var(--serif); margin: 0 0 10px; display: flex; align-items: center; gap: 10px; }
 h2 .n { font: 600 .8rem var(--sans); background: var(--accent); color: var(--accent-ink); border-radius: 999px; padding: 2px 10px; }
 .empty { border: 2px dashed var(--line); border-radius: 16px; padding: 22px; text-align: center; color: var(--ink-soft); }
 
@@ -54,7 +54,7 @@ h2 .n { font: 600 .8rem var(--sans); background: var(--accent); color: var(--acc
 .job .box { width: 60px; height: 60px; border-radius: 14px; flex: 0 0 auto; display: grid; place-items: center; }
 .job .box svg { width: 38px; height: 38px; }
 .job .what { flex: 1; min-width: 0; }
-.job .what b { display: block; font: 400 1.2rem/1.2 var(--serif); text-transform: uppercase; }
+.job .what b { display: block; font: 600 1.2rem/1.2 var(--serif); }
 .job .what span { color: var(--ink-soft); font-size: .88rem; }
 .tag { display: inline-block; font: 600 .66rem var(--sans); letter-spacing: .14em; text-transform: uppercase; padding: 3px 8px; border-radius: 999px; margin-bottom: 4px; }
 .tag.req { background: #fde7c8; color: #8a5414; }
@@ -69,7 +69,7 @@ h2 .n { font: 600 .8rem var(--sans); background: var(--accent); color: var(--acc
 .order { background: var(--surface); border: 1.5px solid var(--line); border-radius: 18px; padding: 14px 16px; margin-bottom: 10px; }
 .order.new { animation: flash 1.2s ease 2; }
 .order header { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; flex-wrap: wrap; }
-.order header b { font: 400 1.25rem var(--serif); text-transform: uppercase; }
+.order header b { font: 600 1.25rem var(--serif); }
 .order header span { color: var(--ink-soft); font-size: .85rem; }
 .order ul { list-style: none; padding: 0; margin: 10px 0; display: grid; gap: 4px; }
 .order li { display: flex; justify-content: space-between; gap: 10px; }
@@ -89,14 +89,14 @@ h2 .n { font: 600 .8rem var(--sans); background: var(--accent); color: var(--acc
 .slot .box { height: 64px; display: grid; place-items: center; }
 .slot .box svg { width: 34px; height: 34px; }
 .slot .si { padding: 8px 10px 10px; display: grid; gap: 4px; }
-.slot .sn { font: 400 .95rem/1.15 var(--serif); text-transform: uppercase; }
+.slot .sn { font: 500 .95rem/1.15 var(--serif); }
 .st { font: 600 .66rem var(--sans); letter-spacing: .12em; text-transform: uppercase; }
 .st.shelf { color: var(--ok); } .st.requested { color: var(--warn); } .st.table { color: var(--ink); }
 .slot .mini { border: 0; border-radius: 10px; background: var(--plate); padding: 7px 8px; font: 600 .74rem var(--sans); margin-top: 2px; }
 
 .scrim { position: fixed; inset: 0; z-index: 40; background: rgba(20, 8, 22, .45); display: grid; place-items: center; padding: 20px; }
 .sheet { background: var(--surface); border-radius: 22px; width: min(100%, 480px); padding: 24px; max-height: 90vh; overflow: auto; }
-.sheet h3 { font: 400 1.5rem var(--serif); text-transform: uppercase; margin: 0 0 10px; }
+.sheet h3 { font: 600 1.5rem var(--serif); margin: 0 0 10px; }
 .sheet ol { padding-left: 20px; display: grid; gap: 8px; }
 .code { display: flex; gap: 8px; align-items: center; background: var(--plate); border-radius: 12px; padding: 10px 12px; font: 600 .95rem ui-monospace, Menlo, monospace; word-break: break-all; }
 .code button { border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink); padding: 8px 12px; font: 600 .78rem var(--sans); flex: 0 0 auto; }
